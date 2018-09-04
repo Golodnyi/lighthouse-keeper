@@ -123,24 +123,24 @@ fn main() {
 
                 let morty = User {
                     id: UserId::new(0),
-                    username: Some("`Морти`".to_owned()),
+                    username: Some("<b>Морти</b>".to_owned()),
                     date: (self::get_unix_timestamp() - (86400 * 7)) + 1
                 };
                 chat.users.push(morty);
                 command.map(|cmd| match cmd {
                     Command::List => {
                         chat.users.sort_by_key(|k| k.date);
-                        let mut users_list: String = "`Это всего лишь роботы, Морти! В роботов можно стрелять.`\n".to_string();
+                        let mut users_list: String = "<b>Это всего лишь роботы, Морти! В роботов можно стрелять.</b>\n".to_string();
                         for u in chat.users.iter().rev() {
                             users_list.push_str(
                                 u.username.as_ref().unwrap()
                             );
-                            users_list.push_str(" - `");
+                            users_list.push_str(" - <b>");
                             let ago = Duration::new(((self::get_unix_timestamp() + 1) - u.date) as u64, 0);
                             users_list.push_str(format_duration(ago).to_string().as_str());
-                            users_list.push_str("`\n");
+                            users_list.push_str("</b>\n");
                         }
-                        api.spawn(message.text_reply(users_list).parse_mode(ParseMode::Markdown));
+                        api.spawn(message.text_reply(users_list).parse_mode(ParseMode::Html));
                     }
                 });
             }
