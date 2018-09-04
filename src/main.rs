@@ -133,7 +133,7 @@ fn main() {
                         let mut users_list: String = "<b>Это всего лишь роботы, Морти! В роботов можно стрелять.</b>\n".to_string();
                         for u in chat.users.iter().rev() {
                             users_list.push_str(
-                                u.username.as_ref().unwrap()
+                                u.username.as_ref().unwrap_or(&"Сквонч".to_owned())
                             );
                             users_list.push_str(" - <b>");
                             let ago = Duration::new(((self::get_unix_timestamp() + 1) - u.date) as u64, 0);
