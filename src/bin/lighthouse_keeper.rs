@@ -1,10 +1,6 @@
-extern crate serde;
 extern crate futures;
 extern crate telegram_bot;
 extern crate tokio_core;
-#[macro_use]
-extern crate serde_json;
-extern crate reader;
 extern crate structs;
 extern crate commands;
 
@@ -50,62 +46,30 @@ fn main() {
     
     let future = api.stream().for_each(|update| {
         if let UpdateKind::Message(message) = update.kind {
-            if ChatId::new(0) < message.chat.id() {
+            let chat_id = message.chat.id();
+
+            if ChatId::new(0) < chat_id {
                 api.spawn(message.text_reply(
                     format!("Морти! Я работую только в групповых чатах!")
                 ));
 
                 return Ok(())
             }
-            
-            let mut chat: structs::Chat;
+
             let user = structs::User {
                 id: message.from.id,
                 username: message.from.username.to_owned(),
                 date: message.date
             };
-        
-            match reader::read_file(message.chat.id().to_string()) {
-                Ok(data) => {
-                    chat = serde_json::from_str(&data.as_str()).unwrap();
-                },
-                Err(_e) => {
-                    chat = structs::Chat {
-                        id: message.chat.id(),
-                        users: vec![]
-                    }
-                }
-            };
 
-            let mut found = false;
-            for u in chat.users.iter_mut() {
-                if user.id == u.id {
-                    u.date = user.date;
-                    u.username = user.username.to_owned();
-                    found = true;
-                }
-            }
+            list::add_user(chat_id, user);
 
-            if !found {
-                chat.users.push(user);
-            }
-
-            reader::write_file(chat.id.to_string(), json!(chat).to_string()).unwrap();
-     
             if let MessageKind::Text {ref data, ..} = message.kind {
                 let command = get_command(data, "lighthouseKeeperBot");
 
-                let morty = structs::User {
-                    id: UserId::new(0),
-                    username: Some("<b>Морти</b>".to_owned()),
-                    date: (structs::get_unix_timestamp() - (86400 * 7)) + 1
-                };
-                
-                chat.users.push(morty);
-
                 command.map(|cmd| match cmd {
                     Command::List => {
-                        api.spawn(message.text_reply(list::get(chat)).parse_mode(ParseMode::Html));
+                        api.spawn(message.text_reply(list::get(chat_id)).parse_mode(ParseMode::Html));
                     }
                 });
             }
