@@ -1,5 +1,4 @@
 extern crate serde;
-extern crate serde_derive;
 extern crate futures;
 extern crate telegram_bot;
 extern crate tokio_core;
@@ -9,7 +8,6 @@ extern crate reader;
 extern crate structs;
 extern crate commands;
 
-use serde_json::*;
 use std::env;
 use futures::Stream;
 use tokio_core::reactor::Core;
