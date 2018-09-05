@@ -67,7 +67,6 @@ fn main() {
                 date: message.date
             };
         
-
             match reader::read_file(message.chat.id().to_string()) {
                 Ok(data) => {
                     chat = serde_json::from_str(&data.as_str()).unwrap();
