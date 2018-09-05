@@ -1,0 +1,12 @@
+[package]
+name = "structs"
+version = "0.1.0"
+authors = ["Golodnyi <ochen@golodnyi.ru>"]
+[lib]
+name = "structs"
+path = "lib.rs"
+[dependencies]
+serde_derive = "1.0.76"
+serde = "1.0.76"
+telegram-bot = "0.6"
+chrono = "0.4"

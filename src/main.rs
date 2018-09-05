@@ -1,36 +1,20 @@
 extern crate serde;
-#[macro_use]
 extern crate serde_derive;
-extern crate humantime;
 extern crate futures;
 extern crate telegram_bot;
 extern crate tokio_core;
 #[macro_use]
 extern crate serde_json;
 extern crate reader;
-extern crate chrono;
+extern crate structs;
+extern crate commands;
 
-use humantime::format_duration;
 use serde_json::*;
 use std::env;
-use chrono::*;
 use futures::Stream;
 use tokio_core::reactor::Core;
 use telegram_bot::*;
-use std::time::Duration;
-
-#[derive(Serialize, Deserialize)]
-struct Chat {
-    id: ChatId,
-    users: Vec<User>
-}
-
-#[derive(Serialize, Deserialize)]
-struct User {
-    id: UserId,
-    username: Option<String>,
-    date: i64,
-}
+use commands::*;
 
 enum Command {
     List
@@ -55,13 +39,6 @@ fn get_command(message: &str, bot_name: &str) -> Option<Command> {
     }
 }
 
-pub fn get_unix_timestamp() -> i64 {
-    let now = Utc::now();
-    let seconds: i64 = now.timestamp();
-
-    seconds
-}
-
 fn main() {
     let mut core = Core::new().unwrap();
 
@@ -83,8 +60,8 @@ fn main() {
                 return Ok(())
             }
             
-            let mut chat: Chat;
-            let user = User {
+            let mut chat: structs::Chat;
+            let user = structs::User {
                 id: message.from.id,
                 username: message.from.username.to_owned(),
                 date: message.date
@@ -96,7 +73,7 @@ fn main() {
                     chat = serde_json::from_str(&data.as_str()).unwrap();
                 },
                 Err(_e) => {
-                    chat = Chat {
+                    chat = structs::Chat {
                         id: message.chat.id(),
                         users: vec![]
                     }
@@ -121,26 +98,17 @@ fn main() {
             if let MessageKind::Text {ref data, ..} = message.kind {
                 let command = get_command(data, "lighthouseKeeperBot");
 
-                let morty = User {
+                let morty = structs::User {
                     id: UserId::new(0),
                     username: Some("<b>Морти</b>".to_owned()),
-                    date: (self::get_unix_timestamp() - (86400 * 7)) + 1
+                    date: (structs::get_unix_timestamp() - (86400 * 7)) + 1
                 };
+                
                 chat.users.push(morty);
+
                 command.map(|cmd| match cmd {
                     Command::List => {
-                        chat.users.sort_by_key(|k| k.date);
-                        let mut users_list: String = "<b>Это всего лишь роботы, Морти! В роботов можно стрелять.</b>\n".to_string();
-                        for u in chat.users.iter().rev() {
-                            users_list.push_str(
-                                u.username.as_ref().unwrap_or(&"Сквонч".to_owned())
-                            );
-                            users_list.push_str(" - <b>");
-                            let ago = Duration::new(((self::get_unix_timestamp() + 1) - u.date) as u64, 0);
-                            users_list.push_str(format_duration(ago).to_string().as_str());
-                            users_list.push_str("</b>\n");
-                        }
-                        api.spawn(message.text_reply(users_list).parse_mode(ParseMode::Html));
+                        api.spawn(message.text_reply(list::get(chat)).parse_mode(ParseMode::Html));
                     }
                 });
             }

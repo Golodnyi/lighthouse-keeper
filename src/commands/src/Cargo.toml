@@ -1,0 +1,10 @@
+[package]
+name = "commands"
+version = "0.1.0"
+authors = ["Golodnyi <ochen@golodnyi.ru>"]
+[lib]
+name = "commands"
+path = "lib.rs"
+[dependencies]
+structs = { path = "../../structs/src", version = "*" }
+humantime = "1.1.1"
