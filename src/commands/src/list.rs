@@ -10,7 +10,7 @@ use std::time::Duration;
 use self::telegram_bot::*;
 
 pub fn add_user(chat_id: ChatId, user: structs::User) {
-    let mut chat = self::get_users(chat_id);
+    let mut chat = self::get_users(chat_id, false);
     let mut found = false;
 
     for u in chat.users.iter_mut() {
@@ -28,7 +28,7 @@ pub fn add_user(chat_id: ChatId, user: structs::User) {
     reader::write_file(chat.id.to_string(), json!(chat).to_string()).unwrap();
 }
 
-fn get_users(chat_id: ChatId) -> structs::Chat {
+fn get_users(chat_id: ChatId, with_morty: bool) -> structs::Chat {
     let mut chat: structs::Chat;
 
     match reader::read_file(chat_id.to_string()) {
@@ -43,19 +43,21 @@ fn get_users(chat_id: ChatId) -> structs::Chat {
         }
     };
 
-    let morty = structs::User {
-        id: UserId::new(0),
-        username: Some("<b>Морти</b>".to_owned()),
-        date: (structs::get_unix_timestamp() - (86400 * 7)) + 1
-    };
-                
-    chat.users.push(morty);
+    if with_morty {
+        let morty = structs::User {
+            id: UserId::new(0),
+            username: Some("<b>Морти</b>".to_owned()),
+            date: (structs::get_unix_timestamp() - (86400 * 7)) + 1
+        };
+                    
+        chat.users.push(morty);
+    }
 
     chat
 }
 
 pub fn get(chat_id: ChatId) -> String {
-    let mut chat = self::get_users(chat_id);
+    let mut chat = self::get_users(chat_id, true);
 
     chat.users.sort_by_key(|k| k.date);
     let mut users_list: String = "<b>Это всего лишь роботы, Морти! В роботов можно стрелять.</b>\n".to_string();
