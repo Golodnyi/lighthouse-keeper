@@ -11,7 +11,8 @@ use telegram_bot::*;
 use commands::*;
 
 enum Command {
-    List
+    List,
+    Search
 }
 
 fn get_command(message: &str, bot_name: &str) -> Option<Command> {
@@ -21,14 +22,15 @@ fn get_command(message: &str, bot_name: &str) -> Option<Command> {
         return None;
     }
 
-    let mut cmd = message.clone();
+    let mut cmd: Vec<&str> = message.split(' ').collect();
 
-    if cmd.ends_with(bot_name) {
-        cmd = cmd.rsplitn(2, '@').skip(1).next().unwrap();
+    if cmd[0].ends_with(bot_name) {
+        cmd = cmd[0].split('@').collect();
     }
 
-    match cmd {
+    match cmd[0] {
         "/list" => Some(List),
+        "/search" => Some(Search),
         _ => None,
     }
 }
@@ -66,10 +68,12 @@ fn main() {
 
             if let MessageKind::Text {ref data, ..} = message.kind {
                 let command = get_command(data, "lighthouseKeeperBot");
-
                 command.map(|cmd| match cmd {
                     Command::List => {
                         api.spawn(message.text_reply(list::get(chat_id)).parse_mode(ParseMode::Html));
+                    },
+                    Command::Search => {
+                        api.spawn(message.text_reply(search::get(chat_id, "lighthouseKeeperBot", data)).parse_mode(ParseMode::Html));
                     }
                 });
             }

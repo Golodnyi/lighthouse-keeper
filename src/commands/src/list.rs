@@ -28,7 +28,7 @@ pub fn add_user(chat_id: ChatId, user: structs::User) {
     reader::write_file(chat.id.to_string(), json!(chat).to_string()).unwrap();
 }
 
-fn get_users(chat_id: ChatId, with_morty: bool) -> structs::Chat {
+pub fn get_users(chat_id: ChatId, with_morty: bool) -> structs::Chat {
     let mut chat: structs::Chat;
 
     match reader::read_file(chat_id.to_string()) {
