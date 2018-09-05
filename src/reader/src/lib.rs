@@ -4,7 +4,6 @@ use std::fs::File;
 use std::fs::OpenOptions;
 use std::io;
 use std::io::prelude::*;
-use std::io::BufWriter;
 use std::path::PathBuf;
 
 pub fn read_file(path: String) -> Result<String, io::Error> {
