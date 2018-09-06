@@ -9,3 +9,4 @@ futures = "0.1.23"
 tokio-core = "0.1.17"
 structs = { path = "src/structs/src", version = "*" }
 commands = { path = "src/commands/src", version = "*" }
+db = { path = "src/db/src", version = "*" }

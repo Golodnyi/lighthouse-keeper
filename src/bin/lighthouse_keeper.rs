@@ -3,6 +3,7 @@ extern crate telegram_bot;
 extern crate tokio_core;
 extern crate structs;
 extern crate commands;
+extern crate db;
 
 use std::env;
 use futures::Stream;
@@ -12,7 +13,8 @@ use commands::*;
 
 enum Command {
     List,
-    Search
+    Search,
+    Messages
 }
 
 fn get_command(message: &str, bot_name: &str) -> Option<Command> {
@@ -31,6 +33,7 @@ fn get_command(message: &str, bot_name: &str) -> Option<Command> {
     match cmd[0] {
         "/list" => Some(List),
         "/search" => Some(Search),
+        "/messages" => Some(Messages),
         _ => None,
     }
 }
@@ -66,7 +69,7 @@ fn main() {
                 msg: 0
             };
 
-            list::add_user(chat_id, user);
+            db::set_user(chat_id, user);
 
             if let MessageKind::Text {ref data, ..} = message.kind {
                 let command = get_command(data, "lighthouseKeeperBot");
@@ -76,6 +79,9 @@ fn main() {
                     },
                     Command::Search => {
                         api.spawn(message.text_reply(search::get(chat_id, "lighthouseKeeperBot", data)).parse_mode(ParseMode::Html));
+                    },
+                    Command::Messages => {
+                        api.spawn(message.text_reply(messages::get(chat_id)).parse_mode(ParseMode::Html));
                     }
                 });
             }

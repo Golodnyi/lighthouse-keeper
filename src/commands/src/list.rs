@@ -7,17 +7,13 @@ use self::humantime::format_duration;
 use std::time::Duration;
 use self::telegram_bot::*;
 
-pub fn add_user(chat_id: ChatId, user: structs::User) -> bool {
-    db::set_user(chat_id, user)
-}
-
 pub fn get_users(chat_id: ChatId, with_morty: bool) -> structs::Chat {
     let mut chat = structs::Chat {
         id: chat_id,
         users: vec![]
     };
 
-    chat.users = db::get_users(chat_id);
+    chat.users = db::get_users(chat_id, "date".to_owned());
 
     if with_morty {
         let morty = structs::User {
