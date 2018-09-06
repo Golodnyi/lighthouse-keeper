@@ -21,37 +21,40 @@ pub fn set_user(chat_id: ChatId, user: structs::User) -> bool {
         &[&user.id.to_string(), &chat_id.to_string()]
     ).unwrap();
 
+    connection.close().expect("connection not closed");
+
     true
 }
 
 pub fn get_users(chat_id: ChatId) -> Vec<structs::User> {
     let connection = self::connect();
-
-    let mut stmt = connection.prepare("SELECT id, username, first_name, date, msg FROM users WHERE chat_id = ?1 ORDER BY date DESC").unwrap();
     let mut users: Vec<structs::User> = vec![];
 
-    let users_iter = stmt.query_map(&[&chat_id.to_string()], |row| {
-        structs::User {
-            id: UserId::new(row.get(0)),
-            username: Some(row.get(1)),
-            first_name: row.get(2),
-            date: row.get(3),
-            msg: row.get(4)
-        }
-    }).unwrap();
-
-    for user in users_iter
     {
-        users.push(user.unwrap());
+        let mut stmt = connection.prepare("SELECT id, username, first_name, date, msg FROM users WHERE chat_id = ?1 ORDER BY date DESC").unwrap();
+
+        let users_iter = stmt.query_map(&[&chat_id.to_string()], |row| {
+            structs::User {
+                id: UserId::new(row.get(0)),
+                username: Some(row.get(1)),
+                first_name: row.get(2),
+                date: row.get(3),
+                msg: row.get(4)
+            }
+        }).unwrap();
+        for user in users_iter
+        {
+            users.push(user.unwrap());
+        }
     }
+
+    connection.close().expect("connection not closed");
 
     users
 }
 
 pub fn get_user(chat_id: ChatId, username: String) -> structs::User {
     let connection = self::connect();
-
-    let mut stmt = connection.prepare("SELECT id, username, first_name, date, msg FROM users WHERE chat_id = ?1 AND UPPER(username) = ?2 LIMIT 1").unwrap();
     let mut user: structs::User = structs::User {
         id: UserId::new(0),
         username: Some("Сквонч".to_owned()),
@@ -60,20 +63,28 @@ pub fn get_user(chat_id: ChatId, username: String) -> structs::User {
         msg: 0
     };
 
-    let users_iter = stmt.query_map(&[&chat_id.to_string(), &username.to_uppercase()], |row| {
-        structs::User {
-            id: UserId::new(row.get(0)),
-            username: Some(row.get(1)),
-            first_name: row.get(2),
-            date: row.get(3),
-            msg: row.get(4)
-        }
-    }).unwrap();
-
-    for u in users_iter
     {
-        user = u.unwrap();
+        let mut stmt = connection.prepare("SELECT id, username, first_name, date, msg FROM users WHERE chat_id = ?1 AND UPPER(username) = ?2 LIMIT 1").unwrap();
+  
+
+        let users_iter = stmt.query_map(&[&chat_id.to_string(), &username.to_uppercase()], |row| {
+            structs::User {
+                id: UserId::new(row.get(0)),
+                username: Some(row.get(1)),
+                first_name: row.get(2),
+                date: row.get(3),
+                msg: row.get(4)
+            }
+        }).unwrap();
+
+        for u in users_iter
+        {
+            user = u.unwrap();
+        }
+
     }
+
+    connection.close().expect("connection not closed");
 
     user
 }
