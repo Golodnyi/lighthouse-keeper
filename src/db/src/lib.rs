@@ -27,7 +27,7 @@ pub fn set_user(chat_id: ChatId, user: structs::User) -> bool {
 pub fn get_users(chat_id: ChatId) -> Vec<structs::User> {
     let connection = self::connect();
 
-    let mut stmt = connection.prepare("SELECT id, username, first_name, date, msg FROM users WHERE chat_id = ?1").unwrap();
+    let mut stmt = connection.prepare("SELECT id, username, first_name, date, msg FROM users WHERE chat_id = ?1 ORDER BY date DESC").unwrap();
     let mut users: Vec<structs::User> = vec![];
 
     let users_iter = stmt.query_map(&[&chat_id.to_string()], |row| {
