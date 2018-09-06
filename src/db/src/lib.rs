@@ -16,6 +16,11 @@ pub fn set_user(chat_id: ChatId, user: structs::User) -> bool {
         &[&user.id.to_string(), &chat_id.to_string(), &user.username.unwrap_or("Сквонч".to_owned()), &user.first_name, &user.date]
     ).unwrap();
 
+    connection.execute(
+        "UPDATE users SET msg = msg + 1 WHERE id = ?1 AND chat_id = ?2;",
+        &[&user.id.to_string(), &chat_id.to_string()]
+    ).unwrap();
+
     true
 }
 
