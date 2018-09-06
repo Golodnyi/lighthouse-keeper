@@ -8,8 +8,5 @@ path = "lib.rs"
 [dependencies]
 structs = { path = "../../structs/src", version = "*" }
 humantime = "1.1.1"
-serde_json = "1.0.26"
-serde = "1.0.76"
-reader = { path = "../../reader/src", version = "*" }
 db = { path = "../../db/src", version = "*" }
 telegram-bot = "0.6"

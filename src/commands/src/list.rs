@@ -1,8 +1,5 @@
-extern crate serde;
-extern crate serde_json;
 extern crate structs;
 extern crate humantime;
-extern crate reader;
 extern crate telegram_bot;
 extern crate db;
 
