@@ -1,0 +1,11 @@
+[package]
+name = "db"
+version = "0.1.0"
+authors = ["Golodnyi <ochen@golodnyi.ru>"]
+[lib]
+name = "db"
+path = "lib.rs"
+[dependencies]
+rusqlite = "0.14.0"
+telegram-bot = "0.6"
+structs = { path = "../../structs/src", version = "*" }

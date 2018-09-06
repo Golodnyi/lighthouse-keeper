@@ -17,7 +17,9 @@ pub struct Chat {
 pub struct User {
     pub id: UserId,
     pub username: Option<String>,
+    pub first_name: String,
     pub date: i64,
+    pub msg: i64
 }
 
 pub fn get_unix_timestamp() -> i64 {

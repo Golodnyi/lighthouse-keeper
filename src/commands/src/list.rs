@@ -4,50 +4,31 @@ extern crate structs;
 extern crate humantime;
 extern crate reader;
 extern crate telegram_bot;
+extern crate db;
 
 use self::humantime::format_duration;
 use std::time::Duration;
 use self::telegram_bot::*;
 
-pub fn add_user(chat_id: ChatId, user: structs::User) {
-    let mut chat = self::get_users(chat_id, false);
-    let mut found = false;
-
-    for u in chat.users.iter_mut() {
-        if user.id == u.id {
-            u.date = user.date;
-            u.username = user.username.to_owned();
-            found = true;
-        }
-    }
-
-    if !found {
-        chat.users.push(user);
-    }
-
-    reader::write_file(chat.id.to_string(), json!(chat).to_string()).unwrap();
+pub fn add_user(chat_id: ChatId, user: structs::User) -> bool {
+    db::set_user(chat_id, user)
 }
 
 pub fn get_users(chat_id: ChatId, with_morty: bool) -> structs::Chat {
-    let mut chat: structs::Chat;
-
-    match reader::read_file(chat_id.to_string()) {
-        Ok(data) => {
-            chat = serde_json::from_str(&data.as_str()).unwrap()
-        },
-        Err(_e) => {
-            chat = structs::Chat {
-                id: chat_id,
-                users: vec![]
-            }
-        }
+    let mut chat = structs::Chat {
+        id: chat_id,
+        users: vec![]
     };
+
+    chat.users = db::get_users(chat_id);
 
     if with_morty {
         let morty = structs::User {
             id: UserId::new(0),
             username: Some("<b>Морти</b>".to_owned()),
-            date: (structs::get_unix_timestamp() - (86400 * 7)) + 1
+            date: (structs::get_unix_timestamp() - (86400 * 7)) + 1,
+            first_name: "морти".to_string(),
+            msg: 0
         };
                     
         chat.users.push(morty);

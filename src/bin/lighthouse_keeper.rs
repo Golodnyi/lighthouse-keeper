@@ -61,7 +61,9 @@ fn main() {
             let user = structs::User {
                 id: message.from.id,
                 username: message.from.username.to_owned(),
-                date: message.date
+                date: message.date,
+                first_name: message.from.first_name.to_owned(),
+                msg: 0
             };
 
             list::add_user(chat_id, user);

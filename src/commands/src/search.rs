@@ -1,6 +1,7 @@
 extern crate structs;
 extern crate telegram_bot;
 extern crate humantime;
+extern crate db;
 
 use self::telegram_bot::*;
 use self::humantime::format_duration;
@@ -36,24 +37,20 @@ pub fn get(chat_id: ChatId, bot_name: &str, message: &str) -> String {
 }
 
 fn get_message(chat_id: ChatId, username: &str) -> String {
-    use list;
+    let user = db::get_user(chat_id, username.to_string());
 
-    let chat = list::get_users(chat_id, false);
-    match chat.users.iter().position(|u| u.username == Some(username.to_string())) {
-        Some(index) => {
-            let ago = Duration::new(((structs::get_unix_timestamp() + 1) - chat.users[index].date) as u64, 0);
-            let mut answer: String = "Морти, кажется я видел <b>@".to_owned();
-            answer.push_str(
-                chat.users[index].username.as_ref().unwrap_or(&"Сквонч".to_owned())
-            );
-            answer.push_str("</b> ");
-            answer.push_str(format_duration(ago).to_string().as_str());
-            answer.push_str(" назад");
-
-            return answer;
-        },
-        None => {}
+    if user.id == UserId::new(0) {
+        return "Морти, я понятия не имею о ком ты говоришь!".to_owned()
     }
 
-    "Морти, я понятия не имею о ком ты говоришь!".to_owned()
+    let ago = Duration::new(((structs::get_unix_timestamp() + 1) - user.date) as u64, 0);
+    let mut answer: String = "Морти, кажется я видел <b>@".to_owned();
+    answer.push_str(
+        user.username.as_ref().unwrap_or(&"Сквонч".to_owned())
+    );
+    answer.push_str("</b> ");
+    answer.push_str(format_duration(ago).to_string().as_str());
+    answer.push_str(" назад");
+
+    answer
 }
