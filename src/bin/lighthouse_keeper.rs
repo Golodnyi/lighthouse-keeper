@@ -62,32 +62,47 @@ fn main() {
     
     let future = api.stream().for_each(|update| {
         if let UpdateKind::CallbackQuery(message) = &update.kind {
-            let msg = message.clone();
-            let reply_message = *msg.message.reply_to_message.unwrap();
             let chat_id = message.message.chat.id();
-            let user_id = message.data.to_owned();
-            let text = search::get_message(chat_id, user_id);
-            match reply_message {
-                MessageOrChannelPost::Message(msg) => {
-                    if let MessageKind::Text { ref data, .. } = msg.kind {
-                        let command = get_command(data, "lighthouseKeeperBot");
-                        command.map(|cmd| match cmd {
-                            Command::Help => {
-                            },
-                            Command::Search => {
-                                api.spawn(message.message.edit_text(text).parse_mode(ParseMode::Html));
-                            },
-                            Command::Messages => {
-                            },
-                            Command::Unknown => {
-                            }
-                        });
-                    }
-                },
-                MessageOrChannelPost::ChannelPost(_msg) => {
+            println!("data: {:?}", message.data);
+            if message.data.starts_with("forward") {
+                let params: Vec<&str> = message.data.split('_').collect();
+                let offset: i32 = params[1].parse::<i32>().unwrap();
+                let text = format!("Выберите пользователя");
+                let markup = search::get_buttons(chat_id, 8 * offset as u32, 8);
+                api.spawn(message.message.edit_text(text).reply_markup(markup));
+            } else if message.data.starts_with("preview").to_owned() {
+                let params: Vec<&str> = message.data.split('_').collect();
+                let offset: i32 = params[1].parse::<i32>().unwrap();
+                let text = format!("Выберите пользователя");
+                let markup = search::get_buttons(chat_id, 8 * offset as u32 - 8, 8);
+                api.spawn(message.message.edit_text(text).reply_markup(markup));
+            } else {
+                let msg = message.clone();
+                let reply_message = *msg.message.reply_to_message.unwrap();
+                let user_id = message.data.to_owned();
+                let text = search::get_message(chat_id, user_id);
+                match reply_message {
+                    MessageOrChannelPost::Message(msg) => {
+                        if let MessageKind::Text { ref data, .. } = msg.kind {
+                            let command = get_command(data, "lighthouseKeeperBot");
+                            command.map(|cmd| match cmd {
+                                Command::Help => {
+                                },
+                                Command::Search => {
+                                    api.spawn(message.message.edit_text(text).parse_mode(ParseMode::Html));
+                                },
+                                Command::Messages => {
+                                },
+                                Command::Unknown => {
+                                }
+                            });
+                        }
+                    },
+                    MessageOrChannelPost::ChannelPost(_msg) => {
 
+                    }
                 }
-            };
+            }
         }
 
         if let UpdateKind::Message(message) = update.kind {
@@ -179,10 +194,9 @@ fn main() {
                     Command::Search => {
                         let text = format!("Выберите пользователя");
                         let mut message = message.text_reply(text);
-                        let markup = search::get_buttons(chat_id);
+                        let markup = search::get_buttons(chat_id, 0, 8);
                         message.reply_markup(markup);
                         api.spawn(message);
-                        // api.spawn(message.text_reply(search::get(chat_id, "lighthouseKeeperBot", data)).parse_mode(ParseMode::Html));
                     },
                     Command::Messages => {
                         api.spawn(message.text_reply(messages::get(chat_id)).parse_mode(ParseMode::Html));

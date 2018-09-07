@@ -7,8 +7,9 @@ use self::telegram_bot::*;
 use self::humantime::format_duration;
 use std::time::Duration;
 
-pub fn get_buttons(chat_id: ChatId) -> InlineKeyboardMarkup {   
-    let users = db::get_users(chat_id);
+pub fn get_buttons(chat_id: ChatId, offset: u32, count: u32) -> InlineKeyboardMarkup {   
+    let users = db::get_users(chat_id, offset, count);
+    let users_count = db::get_users_count(chat_id);
     let mut markup = InlineKeyboardMarkup::new();
     markup.add_empty_row();
     {
@@ -16,6 +17,21 @@ pub fn get_buttons(chat_id: ChatId) -> InlineKeyboardMarkup {
             let row = markup.add_empty_row();
             row.push(InlineKeyboardButton::callback(user.username.unwrap_or(user.first_name), user.id.to_string()));
         }
+
+        let row = markup.add_empty_row();
+        if offset > 0 {
+            let mut text: String = "preview_".to_owned();
+            text.push_str((offset / 8).to_string().as_str());
+            row.push(InlineKeyboardButton::callback("<<", text));
+        }
+
+        if (offset + count) < users_count as u32 {
+            let mut text: String = "forward_".to_owned();
+            text.push_str(((offset + count)/8).to_string().as_str());
+            row.push(InlineKeyboardButton::callback(">>", text));
+        }
+
+        println!("{} {} {}", offset, count, users_count);
     }
 
     markup

@@ -11,7 +11,7 @@ pub fn get(chat_id: ChatId) -> String {
         users: vec![]
     };
 
-    chat.users = db::get_users(chat_id);
+    chat.users = db::get_users(chat_id, 0, 10);
 
     let mut users_list: String = "<b>Это всего лишь роботы, Морти! В роботов можно стрелять.</b>\n".to_string();
 

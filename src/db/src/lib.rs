@@ -21,13 +21,39 @@ pub fn set_user(chat_id: ChatId, user: structs::User) -> bool {
     true
 }
 
-pub fn get_users(chat_id: ChatId) -> Vec<structs::User> {
+pub fn get_users_count(chat_id: ChatId) -> usize {
     let connection = self::connect();
     let mut users: Vec<structs::User> = vec![];
 
     {
-        let mut stmt = connection.prepare("SELECT id, username, first_name, date, msg FROM users WHERE chat_id = ?1 ORDER BY msg DESC LIMIT 10").unwrap();
+        let mut stmt = connection.prepare("SELECT * FROM users WHERE chat_id = ?1").unwrap();
         let users_iter = stmt.query_map(&[&chat_id.to_string()], |row| {
+            structs::User {
+                id: UserId::new(row.get(0)),
+                username: Some(row.get(1)),
+                first_name: row.get(2),
+                date: row.get(3),
+                msg: row.get(4)
+            }
+        }).unwrap();
+        for user in users_iter
+        {
+            users.push(user.unwrap());
+        }
+    }
+
+    connection.close().expect("connection not closed");
+
+    users.len()
+}
+
+pub fn get_users(chat_id: ChatId, offset: u32, count: u32) -> Vec<structs::User> {
+    let connection = self::connect();
+    let mut users: Vec<structs::User> = vec![];
+
+    {
+        let mut stmt = connection.prepare("SELECT id, username, first_name, date, msg FROM users WHERE chat_id = ?1 ORDER BY msg DESC LIMIT ?2, ?3").unwrap();
+        let users_iter = stmt.query_map(&[&chat_id.to_string(), &offset, &count], |row| {
             structs::User {
                 id: UserId::new(row.get(0)),
                 username: Some(row.get(1)),
