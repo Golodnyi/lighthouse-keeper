@@ -15,6 +15,7 @@ enum Command {
     Search,
     Messages,
     Help,
+    Test,
     Unknown
 }
 
@@ -35,6 +36,7 @@ fn get_command(message: &str, bot_name: &str) -> Option<Command> {
         "/search" => Some(Search),
         "/messages" => Some(Messages),
         "/help" => Some(Help),
+        "/test" => Some(Test),
         _ => Some(Unknown),
     }
 }
@@ -61,6 +63,13 @@ fn main() {
     let api = Api::configure(token).build(core.handle()).unwrap();
     
     let future = api.stream().for_each(|update| {
+        if let UpdateKind::CallbackQuery(message) = &update.kind {
+            let chat_id = message.message.chat.id();
+            let user_id = message.from.id.to_string();
+            let text = search::get_message(chat_id, user_id);
+            api.spawn(message.message.edit_text(text).parse_mode(ParseMode::Html));
+        }
+
         if let UpdateKind::Message(message) = update.kind {
             let chat_id = message.chat.id();
 
@@ -148,11 +157,18 @@ fn main() {
                         api.spawn(message.text_reply(help::get()).parse_mode(ParseMode::Markdown));
                     },
                     Command::Search => {
-                        api.spawn(message.text_reply(search::get(chat_id, "lighthouseKeeperBot", data)).parse_mode(ParseMode::Html));
+                        let text = format!("Выберите пользователя");
+                        let mut message = message.text_reply(text);
+                        let markup = search::get_buttons(chat_id);
+                        message.reply_markup(markup);
+                        api.spawn(message);
+                        // api.spawn(message.text_reply(search::get(chat_id, "lighthouseKeeperBot", data)).parse_mode(ParseMode::Html));
                     },
                     Command::Messages => {
                         api.spawn(message.text_reply(messages::get(chat_id)).parse_mode(ParseMode::Html));
                     },
+                    Command::Test => {
+                    }
                     Command::Unknown => {
                         db::set_user(chat_id, user);
                     }

@@ -11,33 +11,23 @@ fn error() -> String {
     "Морти, ты творишь полную хуйню! /search @username".to_owned()
 }
 
-pub fn get(chat_id: ChatId, bot_name: &str, message: &str) -> String {
-    if !message.starts_with("/") {
-        return self::error();
+pub fn get_buttons(chat_id: ChatId) -> InlineKeyboardMarkup {   
+    let users = db::get_users(chat_id);
+    let mut markup = InlineKeyboardMarkup::new();
+    markup.add_empty_row();
+    {
+        let row = markup.add_empty_row();
+
+        for user in users {
+            row.push(InlineKeyboardButton::callback(user.username.unwrap_or(user.first_name), user.id.to_string()));
+        }
     }
 
-    let cmd = message.clone();
-    let collect: Vec<&str> = cmd.split("@").collect();
-
-    if collect.len() == 3 {
-        if collect[1].trim() != bot_name || collect[0].trim() != "/search" {
-            return self::error();
-        }
-
-        return self::get_message(chat_id, collect[2].trim())
-    } else if collect.len() == 2 {
-        if collect[0].trim() != "/search" {
-            return self::error();
-        }
-
-        return self::get_message(chat_id, collect[1].trim())
-    }
-
-    self::error()
+    markup
 }
 
-fn get_message(chat_id: ChatId, username: &str) -> String {
-    let user = db::get_user(chat_id, username.to_string());
+pub fn get_message(chat_id: ChatId, id: String) -> String {
+    let user = db::get_user_by_id(chat_id, id);
 
     if user.id == UserId::new(0) {
         return "Морти, я понятия не имею о ком ты говоришь!".to_owned()
