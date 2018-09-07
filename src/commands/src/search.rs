@@ -7,10 +7,6 @@ use self::telegram_bot::*;
 use self::humantime::format_duration;
 use std::time::Duration;
 
-fn error() -> String {
-    "Морти, ты творишь полную хуйню! /search @username".to_owned()
-}
-
 pub fn get_buttons(chat_id: ChatId) -> InlineKeyboardMarkup {   
     let users = db::get_users(chat_id);
     let mut markup = InlineKeyboardMarkup::new();

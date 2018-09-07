@@ -65,7 +65,7 @@ fn main() {
     let future = api.stream().for_each(|update| {
         if let UpdateKind::CallbackQuery(message) = &update.kind {
             let chat_id = message.message.chat.id();
-            let user_id = message.from.id.to_string();
+            let user_id = message.data.to_owned();
             let text = search::get_message(chat_id, user_id);
             api.spawn(message.message.edit_text(text).parse_mode(ParseMode::Html));
         }
