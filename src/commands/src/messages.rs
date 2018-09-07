@@ -5,19 +5,13 @@ extern crate db;
 
 use self::telegram_bot::*;
 
-pub fn get_users(chat_id: ChatId) -> structs::Chat {
+pub fn get(chat_id: ChatId) -> String {
     let mut chat = structs::Chat {
         id: chat_id,
         users: vec![]
     };
 
     chat.users = db::get_users(chat_id);
-
-    chat
-}
-
-pub fn get(chat_id: ChatId) -> String {
-    let chat = self::get_users(chat_id);
 
     let mut users_list: String = "<b>Это всего лишь роботы, Морти! В роботов можно стрелять.</b>\n".to_string();
 
