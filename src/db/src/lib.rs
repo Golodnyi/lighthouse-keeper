@@ -26,9 +26,13 @@ pub fn get_users(chat_id: ChatId, order_field: String) -> Vec<structs::User> {
     let mut users: Vec<structs::User> = vec![];
 
     {
-        let mut stmt = connection.prepare("SELECT id, username, first_name, date, msg FROM users WHERE chat_id = ?1 ORDER BY ?2 DESC").unwrap();
-
-        let users_iter = stmt.query_map(&[&chat_id.to_string(), &order_field], |row| {
+        let mut stmt;
+        if order_field == "date".to_owned() {
+            stmt = connection.prepare("SELECT id, username, first_name, date, msg FROM users WHERE chat_id = ?1 ORDER BY date DESC").unwrap();
+        } else {
+            stmt = connection.prepare("SELECT id, username, first_name, date, msg FROM users WHERE chat_id = ?1 ORDER BY msg DESC").unwrap();
+        }
+        let users_iter = stmt.query_map(&[&chat_id.to_string()], |row| {
             structs::User {
                 id: UserId::new(row.get(0)),
                 username: Some(row.get(1)),

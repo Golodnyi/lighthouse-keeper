@@ -31,12 +31,11 @@ pub fn get_users(chat_id: ChatId, with_morty: bool) -> structs::Chat {
 }
 
 pub fn get(chat_id: ChatId) -> String {
-    let mut chat = self::get_users(chat_id, true);
+    let chat = self::get_users(chat_id, true);
 
-    chat.users.sort_by_key(|k| k.date);
     let mut users_list: String = "<b>Это всего лишь роботы, Морти! В роботов можно стрелять.</b>\n".to_string();
 
-    for u in chat.users.iter().rev() {
+    for u in chat.users.iter() {
         let ago = Duration::new(((structs::get_unix_timestamp() + 1) - u.date) as u64, 0);
 
         users_list.push_str(
