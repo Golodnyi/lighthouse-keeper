@@ -11,7 +11,7 @@ pub fn get_users(chat_id: ChatId) -> structs::Chat {
         users: vec![]
     };
 
-    chat.users = db::get_users(chat_id, "msg".to_owned());
+    chat.users = db::get_users(chat_id);
 
     chat
 }
