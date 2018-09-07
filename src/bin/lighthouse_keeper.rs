@@ -62,17 +62,32 @@ fn main() {
                 return Ok(())
             }
 
-            let user = structs::User {
-                id: message.from.id,
-                username: message.from.username.to_owned(),
-                date: message.date,
-                first_name: message.from.first_name.to_owned(),
-                msg: 0
-            };
+            if let MessageKind::NewChatMembers {ref data, ..} = message.kind {
+                for user in data {
+                    let u = structs::User {
+                        id: user.id,
+                        username: user.username.to_owned(),
+                        date: structs::get_unix_timestamp(),
+                        first_name:user.first_name.to_owned(),
+                        msg: 0
+                    };
+                    db::set_user(chat_id, u);
+                }
+            }
+
+            if let MessageKind::LeftChatMember{ref data, ..} = message.kind {
+                db::left_user(chat_id, data.id);
+            }
 
             if let MessageKind::Text {ref data, ..} = message.kind {
+                let user = structs::User {
+                    id: message.from.id,
+                    username: message.from.username.to_owned(),
+                    date: message.date,
+                    first_name: message.from.first_name.to_owned(),
+                    msg: 0
+                };
                 let command = get_command(data, "lighthouseKeeperBot");
-
                 command.map(|cmd| match cmd {
                     Command::Help => {
                         api.spawn(message.text_reply(help::get()).parse_mode(ParseMode::Markdown));

@@ -82,3 +82,13 @@ pub fn get_user(chat_id: ChatId, username: String) -> structs::User {
 
     user
 }
+
+pub fn left_user(chat_id: ChatId, user_id: UserId) {
+    let connection = self::connect();
+    connection.execute(
+        "delete from users where chat_id = ?1 and id = ?2;",
+        &[&chat_id.to_string(), &user_id.to_string()]
+    ).unwrap();
+
+    connection.close().expect("connection not closed");
+}
