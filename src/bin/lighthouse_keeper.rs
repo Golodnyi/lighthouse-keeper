@@ -39,6 +39,16 @@ fn get_command(message: &str, bot_name: &str) -> Option<Command> {
     }
 }
 
+fn parse_user(message: &Message) -> structs::User {
+    structs::User {
+        id: message.from.id,
+        username: message.from.username.to_owned(),
+        date: message.date,
+        first_name: message.from.first_name.to_owned(),
+        msg: 0
+    }
+}
+
 fn main() {
     let mut core = Core::new().unwrap();
 
@@ -79,14 +89,59 @@ fn main() {
                 db::left_user(chat_id, data.id);
             }
 
+            if let MessageKind::Audio {ref data, ..} = message.kind {
+                let user = self::parse_user(&message);
+                db::set_user(chat_id, user);
+            }
+
+            if let MessageKind::Document {ref data, ..} = message.kind {
+                let user = self::parse_user(&message);
+                db::set_user(chat_id, user);
+            }
+
+            if let MessageKind::Photo {ref data, ..} = message.kind {
+                let user = self::parse_user(&message);
+                db::set_user(chat_id, user);
+            }
+
+            if let MessageKind::Sticker {ref data, ..} = message.kind {
+                let user = self::parse_user(&message);
+                db::set_user(chat_id, user);
+            }
+
+            if let MessageKind::Video {ref data, ..} = message.kind {
+                let user = self::parse_user(&message);
+                db::set_user(chat_id, user);
+            }
+
+            if let MessageKind::Voice {ref data, ..} = message.kind {
+                let user = self::parse_user(&message);
+                db::set_user(chat_id, user);
+            }
+
+            if let MessageKind::VideoNote {ref data, ..} = message.kind {
+                let user = self::parse_user(&message);
+                db::set_user(chat_id, user);
+            }
+
+            if let MessageKind::Contact {ref data, ..} = message.kind {
+                let user = self::parse_user(&message);
+                db::set_user(chat_id, user);
+            }
+
+            if let MessageKind::Location {ref data, ..} = message.kind {
+                let user = self::parse_user(&message);
+                db::set_user(chat_id, user);
+            }
+
+            if let MessageKind::Venue {ref data, ..} = message.kind {
+                let user = self::parse_user(&message);
+                db::set_user(chat_id, user);
+            }
+
             if let MessageKind::Text {ref data, ..} = message.kind {
-                let user = structs::User {
-                    id: message.from.id,
-                    username: message.from.username.to_owned(),
-                    date: message.date,
-                    first_name: message.from.first_name.to_owned(),
-                    msg: 0
-                };
+                let user = self::parse_user(&message);
+
                 let command = get_command(data, "lighthouseKeeperBot");
                 command.map(|cmd| match cmd {
                     Command::Help => {
