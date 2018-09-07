@@ -12,9 +12,8 @@ pub fn get_buttons(chat_id: ChatId) -> InlineKeyboardMarkup {
     let mut markup = InlineKeyboardMarkup::new();
     markup.add_empty_row();
     {
-        let row = markup.add_empty_row();
-
         for user in users {
+            let row = markup.add_empty_row();
             row.push(InlineKeyboardButton::callback(user.username.unwrap_or(user.first_name), user.id.to_string()));
         }
     }
