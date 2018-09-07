@@ -31,7 +31,6 @@ pub fn get_buttons(chat_id: ChatId, offset: u32, count: u32) -> InlineKeyboardMa
             row.push(InlineKeyboardButton::callback(">>", text));
         }
 
-        println!("{} {} {}", offset, count, users_count);
     }
 
     markup
