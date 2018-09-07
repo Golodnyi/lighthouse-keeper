@@ -15,7 +15,6 @@ enum Command {
     Search,
     Messages,
     Help,
-    Test,
     Unknown
 }
 
@@ -36,7 +35,6 @@ fn get_command(message: &str, bot_name: &str) -> Option<Command> {
         "/search" => Some(Search),
         "/messages" => Some(Messages),
         "/help" => Some(Help),
-        "/test" => Some(Test),
         _ => Some(Unknown),
     }
 }
@@ -64,10 +62,32 @@ fn main() {
     
     let future = api.stream().for_each(|update| {
         if let UpdateKind::CallbackQuery(message) = &update.kind {
+            let msg = message.clone();
+            let reply_message = *msg.message.reply_to_message.unwrap();
             let chat_id = message.message.chat.id();
             let user_id = message.data.to_owned();
             let text = search::get_message(chat_id, user_id);
-            api.spawn(message.message.edit_text(text).parse_mode(ParseMode::Html));
+            match reply_message {
+                MessageOrChannelPost::Message(msg) => {
+                    if let MessageKind::Text { ref data, .. } = msg.kind {
+                        let command = get_command(data, "lighthouseKeeperBot");
+                        command.map(|cmd| match cmd {
+                            Command::Help => {
+                            },
+                            Command::Search => {
+                                api.spawn(message.message.edit_text(text).parse_mode(ParseMode::Html));
+                            },
+                            Command::Messages => {
+                            },
+                            Command::Unknown => {
+                            }
+                        });
+                    }
+                },
+                MessageOrChannelPost::ChannelPost(_msg) => {
+
+                }
+            };
         }
 
         if let UpdateKind::Message(message) = update.kind {
@@ -167,8 +187,6 @@ fn main() {
                     Command::Messages => {
                         api.spawn(message.text_reply(messages::get(chat_id)).parse_mode(ParseMode::Html));
                     },
-                    Command::Test => {
-                    }
                     Command::Unknown => {
                         db::set_user(chat_id, user);
                     }
