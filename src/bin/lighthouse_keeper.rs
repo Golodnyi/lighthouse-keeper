@@ -63,7 +63,7 @@ fn main() {
     let future = api.stream().for_each(|update| {
         if let UpdateKind::CallbackQuery(message) = &update.kind {
             let chat_id = message.message.chat.id();
-            println!("data: {:?}", message.data);
+
             if message.data.starts_with("forward") {
                 let params: Vec<&str> = message.data.split('_').collect();
                 let offset: i32 = params[1].parse::<i32>().unwrap();

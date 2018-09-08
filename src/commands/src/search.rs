@@ -46,7 +46,7 @@ pub fn get_message(chat_id: ChatId, id: String) -> String {
     let ago = Duration::new(((structs::get_unix_timestamp() + 1) - user.date) as u64, 0);
     let mut answer: String = "Морти, кажется я видел <b>@".to_owned();
     answer.push_str(
-        user.username.as_ref().unwrap_or(&"Сквонч".to_owned())
+        user.username.as_ref().unwrap_or(&user.first_name)
     );
     answer.push_str("</b> ");
     answer.push_str(format_duration(ago).to_string().as_str());

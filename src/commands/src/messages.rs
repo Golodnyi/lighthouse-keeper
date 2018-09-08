@@ -17,7 +17,7 @@ pub fn get(chat_id: ChatId) -> String {
 
     for u in chat.users.iter() {
         users_list.push_str(
-            u.username.as_ref().unwrap_or(&"Сквонч".to_owned())
+            u.username.as_ref().unwrap_or(&u.first_name)
         );
         users_list.push_str(" - <b>");
         users_list.push_str(u.msg.to_string().as_str());
