@@ -14,7 +14,6 @@ use commands::*;
 enum Command {
     Search,
     Messages,
-    Help,
     Unknown
 }
 
@@ -34,7 +33,6 @@ fn get_command(message: &str, bot_name: &str) -> Option<Command> {
     match cmd[0] {
         "/search" => Some(Search),
         "/messages" => Some(Messages),
-        "/help" => Some(Help),
         _ => Some(Unknown),
     }
 }
@@ -63,46 +61,57 @@ fn main() {
     let future = api.stream().for_each(|update| {
         if let UpdateKind::CallbackQuery(message) = &update.kind {
             let chat_id = message.message.chat.id();
-
-            if message.data.starts_with("forward") {
-                let params: Vec<&str> = message.data.split('_').collect();
-                let offset: i32 = params[1].parse::<i32>().unwrap();
-                let text = format!("Выберите пользователя");
-                let markup = search::get_buttons(chat_id, 8 * offset as u32, 8);
-                api.spawn(message.message.edit_text(text).reply_markup(markup));
-            } else if message.data.starts_with("preview").to_owned() {
-                let params: Vec<&str> = message.data.split('_').collect();
-                let offset: i32 = params[1].parse::<i32>().unwrap();
-                let text = format!("Выберите пользователя");
-                let markup = search::get_buttons(chat_id, 8 * offset as u32 - 8, 8);
-                api.spawn(message.message.edit_text(text).reply_markup(markup));
-            } else {
-                let msg = message.clone();
-                let reply_message = *msg.message.reply_to_message.unwrap();
-                let user_id = message.data.to_owned();
-                let text = search::get_message(chat_id, user_id);
-                match reply_message {
-                    MessageOrChannelPost::Message(msg) => {
-                        if let MessageKind::Text { ref data, .. } = msg.kind {
-                            let command = get_command(data, "lighthouseKeeperBot");
-                            command.map(|cmd| match cmd {
-                                Command::Help => {
-                                },
-                                Command::Search => {
+            let msg = message.clone();
+            let reply_message = *msg.message.reply_to_message.unwrap();
+            let user_id = message.data.to_owned();
+            let text = search::get_message(chat_id, user_id);
+            match reply_message {
+                MessageOrChannelPost::Message(msg) => {
+                    if let MessageKind::Text { ref data, .. } = msg.kind {
+                        let command = get_command(data, "lighthouseKeeperBot");
+                        command.map(|cmd| match cmd {
+                            Command::Search => {
+                                if message.data.starts_with("forward") {
+                                    let params: Vec<&str> = message.data.split('_').collect();
+                                    let offset: i32 = params[1].parse::<i32>().unwrap();
+                                    let text = format!("Выберите пользователя");
+                                    let markup = search::get_buttons(chat_id, 8 * offset as u32, 8);
+                                    api.spawn(message.message.edit_text(text).reply_markup(markup));
+                                } else if message.data.starts_with("preview").to_owned() {
+                                    let params: Vec<&str> = message.data.split('_').collect();
+                                    let offset: i32 = params[1].parse::<i32>().unwrap();
+                                    let text = format!("Выберите пользователя");
+                                    let markup = search::get_buttons(chat_id, 8 * offset as u32 - 8, 8);
+                                    api.spawn(message.message.edit_text(text).reply_markup(markup));
+                                } else {
                                     api.spawn(message.message.edit_text(text).parse_mode(ParseMode::Html));
-                                },
-                                Command::Messages => {
-                                },
-                                Command::Unknown => {
                                 }
-                            });
-                        }
-                    },
-                    MessageOrChannelPost::ChannelPost(_msg) => {
-
+                            },
+                            Command::Messages => {
+                                if message.data.starts_with("forward") {
+                                    let params: Vec<&str> = message.data.split('_').collect();
+                                    let offset: i32 = params[1].parse::<i32>().unwrap();
+                                    let markup = messages::get_buttons(chat_id, 8 * offset as u32, 8);
+                                    let text = messages::get(chat_id, offset as u32 * 8, 8);
+                                    api.spawn(message.message.edit_text(text).reply_markup(markup).parse_mode(ParseMode::Html));
+                                } else if message.data.starts_with("preview").to_owned() {
+                                    let params: Vec<&str> = message.data.split('_').collect();
+                                    let offset: i32 = params[1].parse::<i32>().unwrap();
+                                    let markup = messages::get_buttons(chat_id, 8 * offset as u32 - 8, 8);
+                                    let text = messages::get(chat_id, offset as u32 * 8 - 8, 8);
+                                    api.spawn(message.message.edit_text(text).reply_markup(markup).parse_mode(ParseMode::Html));
+                                }
+                            },
+                            Command::Unknown => {
+                            }
+                        });
                     }
+                },
+                MessageOrChannelPost::ChannelPost(_msg) => {
+
                 }
             }
+            
         }
 
         if let UpdateKind::Message(message) = update.kind {
@@ -188,9 +197,6 @@ fn main() {
 
                 let command = get_command(data, "lighthouseKeeperBot");
                 command.map(|cmd| match cmd {
-                    Command::Help => {
-                        api.spawn(message.text_reply(help::get()).parse_mode(ParseMode::Markdown));
-                    },
                     Command::Search => {
                         let text = format!("Выберите пользователя");
                         let mut message = message.text_reply(text);
@@ -199,7 +205,8 @@ fn main() {
                         api.spawn(message);
                     },
                     Command::Messages => {
-                        api.spawn(message.text_reply(messages::get(chat_id)).parse_mode(ParseMode::Html));
+                        let markup = messages::get_buttons(chat_id, 0, 8);
+                        api.spawn(message.text_reply(messages::get(chat_id, 0, 8)).reply_markup(markup).parse_mode(ParseMode::Html));
                     },
                     Command::Unknown => {
                         db::set_user(chat_id, user);

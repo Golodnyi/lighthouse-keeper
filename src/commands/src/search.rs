@@ -7,7 +7,7 @@ use self::telegram_bot::*;
 use self::humantime::format_duration;
 use std::time::Duration;
 
-pub fn get_buttons(chat_id: ChatId, offset: u32, count: u32) -> InlineKeyboardMarkup {   
+pub fn get_buttons(chat_id: ChatId, offset: u32, count: u32) -> InlineKeyboardMarkup {
     let users = db::get_users(chat_id, offset, count);
     let users_count = db::get_users_count(chat_id);
     let mut markup = InlineKeyboardMarkup::new();
