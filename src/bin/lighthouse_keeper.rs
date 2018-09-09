@@ -57,7 +57,9 @@ fn main() {
     };
 
     let api = Api::configure(token).build(core.handle()).unwrap();
-    
+    let future = api.send(GetMe);
+    let bot = core.run(future);
+
     let future = api.stream().for_each(|update| {
         if let UpdateKind::CallbackQuery(message) = &update.kind {
             let chat_id = message.message.chat.id();
@@ -126,20 +128,37 @@ fn main() {
             }
 
             if let MessageKind::NewChatMembers {ref data, ..} = message.kind {
-                for user in data {
-                    let u = structs::User {
-                        id: user.id,
-                        username: user.username.to_owned(),
-                        date: structs::get_unix_timestamp(),
-                        first_name:user.first_name.to_owned(),
-                        msg: 0
-                    };
-                    db::set_user(chat_id, u);
+                match bot {
+                    Ok(ref b) => {
+                        for user in data {
+                            let u = structs::User {
+                                id: user.id,
+                                username: user.username.to_owned(),
+                                date: structs::get_unix_timestamp(),
+                                first_name:user.first_name.to_owned(),
+                                msg: 0
+                            };
+
+                            if b.id != user.id {
+                                db::set_user(chat_id, u);
+                            }
+                        }
+                    },
+                    Err(_) => {}
                 }
             }
 
             if let MessageKind::LeftChatMember{ref data, ..} = message.kind {
-                db::left_user(chat_id, data.id);
+                match bot {
+                    Ok(ref b) => {
+                        if b.id == data.id {
+                            db::leave_from_chat(chat_id);
+                        } else {
+                            db::left_user(chat_id, data.id);
+                        }
+                    },
+                    Err(_) => {}
+                }
             }
 
             if let MessageKind::Audio {ref data, ..} = message.kind {

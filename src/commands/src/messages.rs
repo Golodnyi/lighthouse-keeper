@@ -13,7 +13,13 @@ pub fn get(chat_id: ChatId, offset: u32, count: u32) -> String {
 
     chat.users = db::get_users(chat_id, offset, count);
 
-    let mut users_list: String = "<b>Это всего лишь роботы, Морти! В роботов можно стрелять.</b>\n".to_string();
+    let mut users_list: String;
+
+    if chat.users.len() == 0 {
+        users_list = "<b>Морти, похоже в этом чате никто никогда не разговаривал.</b>\n".to_string();
+    } else {
+        users_list = "<b>Это всего лишь роботы, Морти! В роботов можно стрелять.</b>\n".to_string();
+    }
 
     for u in chat.users.iter() {
         users_list.push_str(

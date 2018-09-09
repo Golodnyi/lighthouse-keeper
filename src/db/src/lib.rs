@@ -154,3 +154,13 @@ pub fn left_user(chat_id: ChatId, user_id: UserId) {
 
     connection.close().expect("connection not closed");
 }
+
+pub fn leave_from_chat(chat_id: ChatId) {
+    let connection = self::connect();
+    connection.execute(
+        "delete from users where chat_id = ?1;",
+        &[&chat_id.to_string()]
+    ).unwrap();
+
+    connection.close().expect("connection not closed");
+}
