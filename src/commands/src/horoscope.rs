@@ -106,7 +106,7 @@ pub fn get(sign: u8) -> String {
             text.push_str(h.stats.love.to_string().as_str());
             text.push_str("%.\n---\n");
             
-            text.push_str("```");
+            text.push_str("```\n");
             text.push_str(h.text.as_str());
             text.push_str("```");
         }
