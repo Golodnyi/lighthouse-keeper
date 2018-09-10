@@ -10,10 +10,12 @@ use futures::Stream;
 use tokio_core::reactor::Core;
 use telegram_bot::*;
 use commands::*;
+use std::str::FromStr;
 
 enum Command {
     Search,
     Messages,
+    Horoscope,
     Unknown
 }
 
@@ -33,6 +35,7 @@ fn get_command(message: &str, bot_name: &str) -> Option<Command> {
     match cmd[0] {
         "/search" => Some(Search),
         "/messages" => Some(Messages),
+        "/horoscope" => Some(Horoscope),
         _ => Some(Unknown),
     }
 }
@@ -104,6 +107,10 @@ fn main() {
                                     api.spawn(message.message.edit_text(text).reply_markup(markup).parse_mode(ParseMode::Html));
                                 }
                             },
+                            Command::Horoscope => {
+                                let data = u8::from_str(message.data.as_str()).unwrap();
+                                api.spawn(message.message.edit_text(horoscope::get(data)).parse_mode(ParseMode::Markdown));
+                            }
                             Command::Unknown => {
                             }
                         });
@@ -227,6 +234,10 @@ fn main() {
                         let markup = messages::get_buttons(chat_id, 0, 8);
                         api.spawn(message.text_reply(messages::get(chat_id, 0, 8)).reply_markup(markup).parse_mode(ParseMode::Html));
                     },
+                    Command::Horoscope => {
+                        let markup = horoscope::get_buttons();
+                        api.spawn(message.text_reply("Морти, кто ты по гороскопу?").reply_markup(markup).parse_mode(ParseMode::Html));
+                    }
                     Command::Unknown => {
                         db::set_user(chat_id, user);
                     }
