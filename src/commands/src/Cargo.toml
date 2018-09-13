@@ -9,7 +9,7 @@ path = "lib.rs"
 structs = { path = "../../structs/src", version = "*" }
 humantime = "1.1.1"
 db = { path = "../../db/src", version = "*" }
-telegram-bot = "0.6"
+telegram-bot = { git = "https://github.com/bismuth-party/telegram-bot" }
 serde_derive = "1.0.78"
 serde = "1.0.78"
 serde_json = "1.0.27"

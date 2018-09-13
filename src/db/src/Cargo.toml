@@ -7,5 +7,5 @@ name = "db"
 path = "lib.rs"
 [dependencies]
 rusqlite = "0.14.0"
-telegram-bot = "0.6"
+telegram-bot = { git = "https://github.com/bismuth-party/telegram-bot" }
 structs = { path = "../../structs/src", version = "*" }

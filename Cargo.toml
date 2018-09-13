@@ -4,7 +4,7 @@ version = "0.1.0"
 authors = ["Golodnyi <ochen@golodnyi.ru>"]
 
 [dependencies]
-telegram-bot = "0.6"
+telegram-bot = { git = "https://github.com/bismuth-party/telegram-bot" }
 futures = "0.1.23"
 tokio-core = "0.1.17"
 structs = { path = "src/structs/src", version = "*" }
