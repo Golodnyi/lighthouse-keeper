@@ -17,6 +17,11 @@ pub struct User {
     pub msg: i64
 }
 
+pub struct Silent {
+    pub chat_id: String,
+    pub users: Vec<User>
+}
+
 pub fn get_unix_timestamp() -> i64 {
     let now = Utc::now();
     let seconds: i64 = now.timestamp();

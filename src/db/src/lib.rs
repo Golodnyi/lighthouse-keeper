@@ -164,3 +164,48 @@ pub fn leave_from_chat(chat_id: ChatId) {
 
     connection.close().expect("connection not closed");
 }
+
+pub fn get_chats() -> Vec<String> {
+    let connection = self::connect();
+    let mut chats: Vec<String> = vec![];
+
+    {
+        let mut stmt = connection.prepare("SELECT chat_id FROM users GROUP BY chat_id ORDER BY chat_id ASC").unwrap();
+        let chats_iter = stmt.query_map(&[], |row| {
+            row.get(0)
+        }).unwrap();
+
+        for chat in chats_iter
+        {
+            chats.push(chat.unwrap());
+        }
+    }
+
+    chats
+}
+
+pub fn get_silent(chat_id: &String) -> Vec<structs::User> {
+    let connection = self::connect();
+    let mut silent: Vec<structs::User> = vec![];
+
+    {
+        let mut stmt = connection.prepare("SELECT id, username, first_name, date, msg FROM users WHERE chat_id = ?1 AND date <= ?2 ORDER BY username ASC").unwrap();
+        let month_ago = structs::get_unix_timestamp() - 86400 * 30;
+        let silent_iter = stmt.query_map(&[chat_id, &month_ago], |row| {
+            structs::User {
+                id: UserId::new(row.get(0)),
+                username: Some(row.get(1)),
+                first_name: row.get(2),
+                date: row.get(3),
+                msg: row.get(4)
+            }
+        }).unwrap();
+
+        for s in silent_iter
+        {
+            silent.push(s.unwrap());
+        }
+    }
+
+    silent
+}

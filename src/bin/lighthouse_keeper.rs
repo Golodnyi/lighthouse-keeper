@@ -11,6 +11,8 @@ use tokio_core::reactor::Core;
 use telegram_bot::*;
 use commands::*;
 use std::str::FromStr;
+use std::thread;
+use std::time::Duration;
 
 enum Command {
     Search,
@@ -62,6 +64,39 @@ fn main() {
     let api = Api::configure(token).build(core.handle()).unwrap();
     let future = api.send(GetMe);
     let bot = core.run(future);
+
+    thread::spawn(|| {
+        let mut core_thread = Core::new().unwrap();
+        let token_thread = match env::var("TELEGRAM_BOT_TOKEN") {
+            Ok(tok) => tok,
+            Err(e) =>
+                panic!("Environment variable 'TELEGRAM_BOT_TOKEN' missing! {}", e),
+        };
+        let api_thread: Api = Api::configure(token_thread).build(core_thread.handle()).unwrap();
+
+        loop {
+            let silent = silent::get();
+            for s in silent {
+                let mut message: String = "Молчуны в чате:\n".to_string();
+    
+                for u in s.users {
+                    message.push_str("@");
+                    message.push_str(u.username.as_ref().unwrap_or(&u.first_name));
+                    message.push_str(" ");
+                }
+
+                let chat_id = ChatId::new(s.chat_id.parse::<i64>().unwrap_or(0));
+
+                if chat_id != ChatId::new(0) {
+                    let send = api_thread.send(chat_id.text(message));
+                    core_thread.run(send).unwrap();
+
+                }
+            }
+
+            thread::sleep(Duration::from_millis(86400000));
+        }
+    });
 
     let future = api.stream().for_each(|update| {
         if let UpdateKind::CallbackQuery(message) = &update.kind {
