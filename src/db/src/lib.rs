@@ -226,7 +226,7 @@ pub fn get_silent_for_kick(chat_id: &String) -> Vec<structs::User> {
     let mut silent: Vec<structs::User> = vec![];
 
     {
-        let mut stmt = connection.prepare("SELECT id, username, first_name, date, msg FROM users WHERE chat_id = ?1 AND date <= ?2 AND warning <= ?3 ORDER BY username ASC").unwrap();
+        let mut stmt = connection.prepare("SELECT id, username, first_name, date, msg FROM users WHERE chat_id = ?1 AND date <= ?2 AND warning <= ?3 AND warning > 0 ORDER BY username ASC").unwrap();
         let day_ago = structs::get_unix_timestamp() - 86400;
         let month_ago = structs::get_unix_timestamp() - 86400 * 30;
         let silent_iter = stmt.query_map(&[chat_id, &month_ago, &day_ago], |row| {
