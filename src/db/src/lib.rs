@@ -220,3 +220,41 @@ pub fn get_silent(chat_id: &String) -> Vec<structs::User> {
 
     silent
 }
+
+pub fn get_silent_for_kick(chat_id: &String) -> Vec<structs::User> {
+    let connection = self::connect();
+    let mut silent: Vec<structs::User> = vec![];
+
+    {
+        let mut stmt = connection.prepare("SELECT id, username, first_name, date, msg FROM users WHERE chat_id = ?1 AND date <= ?2 AND warning <= ?3 ORDER BY username ASC").unwrap();
+        let day_ago = structs::get_unix_timestamp() - 86400;
+        let month_ago = structs::get_unix_timestamp() - 86400 * 30;
+        let silent_iter = stmt.query_map(&[chat_id, &month_ago, &day_ago], |row| {
+            structs::User {
+                id: UserId::new(row.get(0)),
+                username: Some(row.get(1)),
+                first_name: row.get(2),
+                date: row.get(3),
+                msg: row.get(4)
+            }
+        }).unwrap();
+
+        for s in silent_iter
+        {
+            let user = s.unwrap();
+
+            let month_ago = structs::get_unix_timestamp() - 86400 * 30;
+
+            connection.execute(
+                "UPDATE users SET warning = 0 WHERE chat_id = ?1 AND id = ?2 AND date >= ?3 LIMIT 1",
+                &[chat_id, &user.id.to_string(), &month_ago]
+            ).unwrap();
+
+            silent.push(user);
+        }
+    }
+
+    connection.close().expect("connection not closed");
+
+    silent
+}
