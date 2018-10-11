@@ -94,7 +94,7 @@ fn main() {
                 }
             }
 
-            let silent_for_kick = silent::get_silent_for_kick();
+            let silent_for_kick = silent::get_for_kick();
 
             for s in silent_for_kick {
                 let mut message: String = "Я готов кикнуть, но @Golodnyi сказал что я еще молод и мне нельзя:\n".to_string();
