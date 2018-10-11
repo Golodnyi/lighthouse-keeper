@@ -208,8 +208,8 @@ pub fn get_silent(chat_id: &String) -> Vec<structs::User> {
             let user = s.unwrap();
 
             connection.execute(
-                "UPDATE users SET warning = 1 WHERE chat_id = ?1 AND id = ?2 LIMIT 1",
-                &[chat_id, &user.id.to_string()]
+                "UPDATE users SET warning = ?1 WHERE chat_id = ?2 AND id = ?3 AND warning = 0 LIMIT 1",
+                &[&structs::get_unix_timestamp(), chat_id, &user.id.to_string()]
             ).unwrap();
 
             silent.push(user);
