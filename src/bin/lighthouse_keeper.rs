@@ -75,26 +75,8 @@ fn main() {
         let (mut core_thread, api_thread) = self::init();
 
         loop {
-            let silent = silent::get();
-            for s in silent {
-                let mut message: String = "Молчуны в чате:\n".to_string();
-    
-                for u in s.users {
-                    message.push_str("@");
-                    message.push_str(u.username.as_ref().unwrap_or(&u.first_name));
-                    message.push_str(" ");
-                }
-
-                let chat_id = ChatId::new(s.chat_id.parse::<i64>().unwrap_or(0));
-
-                if chat_id != ChatId::new(0) {
-                    let send = api_thread.send(chat_id.text(message));
-                    core_thread.run(send).unwrap();
-
-                }
-            }
-
             let silent_for_kick = silent::get_for_kick();
+            let silent_for_kick_count = silent_for_kick.len();
 
             for s in silent_for_kick {
                 let mut message: String = "Я готов кикнуть, но @Golodnyi сказал что я еще молод и мне нельзя:\n".to_string();
@@ -114,6 +96,26 @@ fn main() {
                 }
             }
 
+            if silent_for_kick_count == 0 {
+                let silent = silent::get();
+                for s in silent {
+                    let mut message: String = "Молчуны в чате:\n".to_string();
+        
+                    for u in s.users {
+                        message.push_str("@");
+                        message.push_str(u.username.as_ref().unwrap_or(&u.first_name));
+                        message.push_str(" ");
+                    }
+
+                    let chat_id = ChatId::new(s.chat_id.parse::<i64>().unwrap_or(0));
+
+                    if chat_id != ChatId::new(0) {
+                        let send = api_thread.send(chat_id.text(message));
+                        core_thread.run(send).unwrap();
+
+                    }
+                }
+            }
             thread::sleep(Duration::from_millis(86400000));
         }
     });
