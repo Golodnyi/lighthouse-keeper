@@ -181,6 +181,8 @@ pub fn get_chats() -> Vec<String> {
         }
     }
 
+    connection.close().expect("connection not closed");
+
     chats
 }
 
@@ -203,9 +205,18 @@ pub fn get_silent(chat_id: &String) -> Vec<structs::User> {
 
         for s in silent_iter
         {
-            silent.push(s.unwrap());
+            let user = s.unwrap();
+
+            connection.execute(
+                "UPDATE users SET warning = 1 WHERE chat_id = ?1 AND id = ?2 LIMIT 1",
+                &[chat_id, &user.id.to_string()]
+            ).unwrap();
+
+            silent.push(user);
         }
     }
+
+    connection.close().expect("connection not closed");
 
     silent
 }

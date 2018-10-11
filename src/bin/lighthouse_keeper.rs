@@ -52,8 +52,8 @@ fn parse_user(message: &Message) -> structs::User {
     }
 }
 
-fn main() {
-    let mut core = Core::new().unwrap();
+fn init() -> (Core, Api) {
+    let core = Core::new().unwrap();
 
     let token = match env::var("TELEGRAM_BOT_TOKEN") {
         Ok(tok) => tok,
@@ -62,17 +62,17 @@ fn main() {
     };
 
     let api = Api::configure(token).build(core.handle()).unwrap();
+
+    (core, api)
+}
+
+fn main() {
+    let (mut core, api) = self::init();
     let future = api.send(GetMe);
     let bot = core.run(future);
 
     thread::spawn(|| {
-        let mut core_thread = Core::new().unwrap();
-        let token_thread = match env::var("TELEGRAM_BOT_TOKEN") {
-            Ok(tok) => tok,
-            Err(e) =>
-                panic!("Environment variable 'TELEGRAM_BOT_TOKEN' missing! {}", e),
-        };
-        let api_thread: Api = Api::configure(token_thread).build(core_thread.handle()).unwrap();
+        let (mut core_thread, api_thread) = self::init();
 
         loop {
             let silent = silent::get();
