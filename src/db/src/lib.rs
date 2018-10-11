@@ -246,7 +246,7 @@ pub fn get_silent_for_kick(chat_id: &String) -> Vec<structs::User> {
             let month_ago = structs::get_unix_timestamp() - 86400 * 30;
 
             connection.execute(
-                "UPDATE users SET warning = 0 WHERE chat_id = ?1 AND id = ?2 AND date >= ?3 LIMIT 1",
+                "UPDATE users SET warning = 0 WHERE chat_id = ?1 AND id = ?2 AND date >= ?3 AND warning > 0 LIMIT 1",
                 &[chat_id, &user.id.to_string(), &month_ago]
             ).unwrap();
 
