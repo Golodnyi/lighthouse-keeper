@@ -75,6 +75,7 @@ fn main() {
         let (mut core_thread, api_thread) = self::init();
 
         loop {
+            let silent = silent::get();
             let silent_for_kick = silent::get_for_kick();
             let silent_for_kick_count = silent_for_kick.len();
 
@@ -97,7 +98,6 @@ fn main() {
             }
 
             if silent_for_kick_count == 0 {
-                let silent = silent::get();
                 for s in silent {
                     let mut message: String = "Молчуны в чате:\n".to_string();
         
