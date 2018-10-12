@@ -262,14 +262,23 @@ pub fn can_write_silent() -> bool {
     let mut can_write = false;
     let connection = self::connect();
     {
-        let mut stmt = connection.prepare("SELECT last_check FROM info WHERE last_check <= ?1").unwrap();
+        let mut stmt = connection.prepare("SELECT last_check FROM info WHERE last_check <= ?1 LIMIT 1").unwrap();
         let day_ago = structs::get_unix_timestamp() - 86400;
-        let _silent_iter = stmt.query_map(&[&day_ago], |_row| {
+        let silent_iter = stmt.query_map(&[&day_ago], |row| {
+            let data: i64 = row.get(0);
             can_write = true;
+
+            data
         }).unwrap();
+
+        for _s in silent_iter {
+
+        }
     }
 
-    connection.execute("UPDATE info SET last_check = ?1", &[&structs::get_unix_timestamp()]).unwrap();
+    if can_write {
+        connection.execute("UPDATE info SET last_check = ?1", &[&structs::get_unix_timestamp()]).unwrap();
+    }
     connection.close().expect("connection not closed");
 
     can_write
