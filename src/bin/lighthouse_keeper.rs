@@ -81,15 +81,14 @@ fn main() {
 
             for s in silent_for_kick {
                 let mut message: String = "Судная ночь начата сска:\n".to_string();
-    
+                let chat_id = ChatId::new(s.chat_id.parse::<i64>().unwrap_or(0));
+
                 for u in s.users {
                     message.push_str("@");
                     message.push_str(u.username.as_ref().unwrap_or(&u.first_name));
                     message.push_str(" - убит\n");
+                    api_thread.spawn(KickChatMember::new(chat_id, &u.id));
                 }
-
-                message.push_str("*Функция кика отключена до окончания тестирования");
-                let chat_id = ChatId::new(s.chat_id.parse::<i64>().unwrap_or(0));
 
                 if chat_id != ChatId::new(0) {
                     let send = api_thread.send(chat_id.text(message));
