@@ -100,7 +100,7 @@ fn main() {
 
             if silent_for_kick_count == 0 && db::can_write_silent() {
                 for s in silent {
-                    let mut message: String = "Начнем судную ночь, я определил участников, у них есть 12 часов чтоб подать признаки жизни:\n".to_string();
+                    let mut message: String = "Начнем судную ночь, я определил участников, у них есть ~24 часа чтоб подать признаки жизни:\n".to_string();
         
                     for u in s.users {
                         message.push_str("@");
