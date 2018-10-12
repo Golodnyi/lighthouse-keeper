@@ -116,7 +116,7 @@ fn main() {
                     }
                 }
             }
-            thread::sleep(Duration::from_millis(3600000));
+            thread::sleep(Duration::from_millis(43200000));
         }
     });
 
