@@ -97,7 +97,7 @@ fn main() {
                 }
             }
 
-            if silent_for_kick_count == 0 {
+            if silent_for_kick_count == 0 && db::can_write_silent() {
                 for s in silent {
                     let mut message: String = "Молчуны в чате:\n".to_string();
         
@@ -116,7 +116,7 @@ fn main() {
                     }
                 }
             }
-            thread::sleep(Duration::from_millis(86400000));
+            thread::sleep(Duration::from_millis(3600000));
         }
     });
 
