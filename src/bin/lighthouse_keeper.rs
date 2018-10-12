@@ -80,14 +80,15 @@ fn main() {
             let silent_for_kick_count = silent_for_kick.len();
 
             for s in silent_for_kick {
-                let mut message: String = "Я готов кикнуть, но @Golodnyi сказал что я еще молод и мне нельзя:\n".to_string();
+                let mut message: String = "Судная ночь начата:\n".to_string();
     
                 for u in s.users {
                     message.push_str("@");
                     message.push_str(u.username.as_ref().unwrap_or(&u.first_name));
-                    message.push_str(" ");
+                    message.push_str(" - убит\n");
                 }
 
+                message.push_str("*Функция кика отключена до окончания тестирования");
                 let chat_id = ChatId::new(s.chat_id.parse::<i64>().unwrap_or(0));
 
                 if chat_id != ChatId::new(0) {
@@ -99,13 +100,15 @@ fn main() {
 
             if silent_for_kick_count == 0 && db::can_write_silent() {
                 for s in silent {
-                    let mut message: String = "Молчуны в чате:\n".to_string();
+                    let mut message: String = "Начнем судную ночь, я определил участников, у них есть 12 часов чтоб подать признаки жизни:\n".to_string();
         
                     for u in s.users {
                         message.push_str("@");
                         message.push_str(u.username.as_ref().unwrap_or(&u.first_name));
                         message.push_str(" ");
                     }
+
+                    message.push_str("\nВы можете бежать, но вам не спрятаться, сска!")
 
                     let chat_id = ChatId::new(s.chat_id.parse::<i64>().unwrap_or(0));
 
