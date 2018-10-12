@@ -89,6 +89,7 @@ fn main() {
                     message.push_str(" - убит\n");
                     let kick = api_thread.send(KickChatMember::new(chat_id, &u.id));
                     core_thread.run(kick).unwrap();
+                    db::left_user(chat_id, u.id);
                 }
 
                 if chat_id != ChatId::new(0) {
