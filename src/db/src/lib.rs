@@ -121,7 +121,6 @@ pub fn get_user_by_username(chat_id: ChatId, username: String) -> structs::User 
 
     {
         let mut stmt = connection.prepare("SELECT id, username, first_name, date, msg FROM users WHERE chat_id = ?1 AND UPPER(username) = ?2 LIMIT 1").unwrap();
-  
 
         let users_iter = stmt.query_map(&[&chat_id.to_string(), &username.to_uppercase()], |row| {
             structs::User {
