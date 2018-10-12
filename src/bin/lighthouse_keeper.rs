@@ -87,7 +87,8 @@ fn main() {
                     message.push_str("@");
                     message.push_str(u.username.as_ref().unwrap_or(&u.first_name));
                     message.push_str(" - убит\n");
-                    api_thread.spawn(KickChatMember::new(chat_id, &u.id));
+                    let kick = api_thread.send(KickChatMember::new(chat_id, &u.id));
+                    core_thread.run(kick).unwrap();
                 }
 
                 if chat_id != ChatId::new(0) {
