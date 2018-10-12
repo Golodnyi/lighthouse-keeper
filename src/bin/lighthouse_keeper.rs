@@ -80,7 +80,7 @@ fn main() {
             let silent_for_kick_count = silent_for_kick.len();
 
             for s in silent_for_kick {
-                let mut message: String = "Судная ночь начата:\n".to_string();
+                let mut message: String = "Судная ночь начата сска:\n".to_string();
     
                 for u in s.users {
                     message.push_str("@");
