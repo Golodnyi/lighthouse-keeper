@@ -108,7 +108,7 @@ fn main() {
                         message.push_str(" ");
                     }
 
-                    message.push_str("\nВы можете бежать, но вам не спрятаться, сска!")
+                    message.push_str("\nВы можете бежать, но вам не спрятаться, сска!");
 
                     let chat_id = ChatId::new(s.chat_id.parse::<i64>().unwrap_or(0));
 
