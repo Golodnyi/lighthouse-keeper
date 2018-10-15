@@ -382,6 +382,7 @@ dependencies = [
  "futures 0.1.24 (registry+https://github.com/rust-lang/crates.io-index)",
  "structs 0.1.0",
  "telegram-bot 0.6.1 (git+https://github.com/bismuth-party/telegram-bot)",
+ "telegram-bot-raw 0.6.1 (git+https://github.com/bismuth-party/telegram-bot)",
  "tokio-core 0.1.17 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
