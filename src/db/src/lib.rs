@@ -259,26 +259,32 @@ pub fn get_silent_for_kick(chat_id: &String) -> Vec<structs::User> {
     silent
 }
 
-pub fn can_write_silent() -> bool {
+pub fn can_write_silent(chat_id: ChatId) -> bool {
+    let mut exist = false;
     let mut can_write = false;
     let connection = self::connect();
     {
-        let mut stmt = connection.prepare("SELECT last_check FROM info WHERE last_check <= ?1 LIMIT 1").unwrap();
+        let mut stmt = connection.prepare("SELECT last_check FROM info WHERE chat_id = ?1 LIMIT 1").unwrap();
         let day_ago = structs::get_unix_timestamp() - 86400;
-        let silent_iter = stmt.query_map(&[&day_ago], |row| {
+        let silent_iter = stmt.query_map(&[&chat_id.to_string()], |row| {
             let data: i64 = row.get(0);
-            can_write = true;
-
+            exist = true;
             data
         }).unwrap();
 
-        for _s in silent_iter {
-
+        for s in silent_iter {
+            if (s.unwrap_or(0) - day_ago) < 0 {
+                can_write = true;
+            }
         }
     }
 
-    if can_write {
-        connection.execute("UPDATE info SET last_check = ?1", &[&structs::get_unix_timestamp()]).unwrap();
+    if can_write || !exist {
+        connection.execute(
+            "insert or replace into info (chat_id, last_check) values (?1, ?2);",
+            &[&chat_id.to_string(), &structs::get_unix_timestamp()]
+        ).unwrap();
+        can_write = true;
     }
     connection.close().expect("connection not closed");
 

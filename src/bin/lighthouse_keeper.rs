@@ -114,12 +114,16 @@ fn main() {
                 }
             }
 
-            if silent_for_kick_count == 0 && db::can_write_silent() {
+            if silent_for_kick_count == 0 {
                 let mut count_users = 0;
                 for s in silent {
                     let mut message: String = "Начнем судную ночь, я определил участников, у них есть ~24 часа чтоб подать признаки жизни:\n".to_string();
                     let chat_id = ChatId::new(s.chat_id.parse::<i64>().unwrap_or(0));
         
+                    if db::can_write_silent(chat_id) == false {
+                        continue;
+                    }
+
                     for u in s.users {
                         let chat_member = api_thread.send(GetChatMember::new(chat_id, &u.id));
                         match core_thread.run(chat_member) {
