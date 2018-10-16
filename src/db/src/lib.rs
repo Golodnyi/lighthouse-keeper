@@ -11,9 +11,10 @@ fn connect() -> Connection {
 
 pub fn set_user(chat_id: ChatId, user: structs::User) -> bool {
     let connection = self::connect();
+    let copy_first_name = user.first_name.clone();
     connection.execute(
         "insert or replace into users (id, chat_id, username, first_name, date, msg) values (?1, ?2, ?3, ?4, ?5, (SELECT msg+1 FROM users WHERE chat_id = ?2 AND id = ?1 LIMIT 1));",
-        &[&user.id.to_string(), &chat_id.to_string(), &user.username.unwrap_or("Сквонч".to_owned()), &user.first_name, &user.date]
+        &[&user.id.to_string(), &chat_id.to_string(), &user.username.unwrap_or(copy_first_name), &user.first_name, &user.date]
     ).unwrap();
 
     connection.close().expect("connection not closed");
