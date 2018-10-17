@@ -186,6 +186,60 @@ pub fn get_chats() -> Vec<String> {
     chats
 }
 
+pub fn get_all_users_count() -> usize {
+    let connection = self::connect();
+    let mut users: Vec<structs::User> = vec![];
+
+    {
+        let mut stmt = connection.prepare("SELECT * FROM users GROUP BY id").unwrap();
+        let users_iter = stmt.query_map(&[], |row| {
+            structs::User {
+                id: UserId::new(row.get(0)),
+                username: Some(row.get(1)),
+                first_name: row.get(2),
+                date: row.get(3),
+                msg: row.get(4)
+            }
+        }).unwrap();
+        for user in users_iter
+        {
+            users.push(user.unwrap());
+        }
+    }
+
+    connection.close().expect("connection not closed");
+
+    users.len()
+}
+
+pub fn get_all_silent() -> Vec<structs::User> {
+    let connection = self::connect();
+    let mut silent: Vec<structs::User> = vec![];
+
+    {
+        let mut stmt = connection.prepare("SELECT id, username, first_name, date, msg FROM users WHERE date <= ?1 ORDER BY username ASC").unwrap();
+        let month_ago = structs::get_unix_timestamp() - 86400 * 30;
+        let silent_iter = stmt.query_map(&[&month_ago], |row| {
+            structs::User {
+                id: UserId::new(row.get(0)),
+                username: Some(row.get(1)),
+                first_name: row.get(2),
+                date: row.get(3),
+                msg: row.get(4)
+            }
+        }).unwrap();
+
+        for s in silent_iter
+        {
+            silent.push(s.unwrap());
+        }
+    }
+
+    connection.close().expect("connection not closed");
+
+    silent
+}
+
 pub fn get_silent(chat_id: &String) -> Vec<structs::User> {
     let connection = self::connect();
     let mut silent: Vec<structs::User> = vec![];

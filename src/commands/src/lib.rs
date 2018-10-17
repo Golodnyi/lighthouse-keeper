@@ -5,3 +5,4 @@ pub mod search;
 pub mod messages;
 pub mod horoscope;
 pub mod silent;
+pub mod about;

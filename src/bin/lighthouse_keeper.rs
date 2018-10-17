@@ -20,6 +20,7 @@ enum Command {
     Search,
     Messages,
     Horoscope,
+    About,
     Unknown
 }
 
@@ -40,6 +41,7 @@ fn get_command(message: &str, bot_name: &str) -> Option<Command> {
         "/search" => Some(Search),
         "/messages" => Some(Messages),
         "/horoscope" => Some(Horoscope),
+        "/about" => Some(About),
         _ => Some(Unknown),
     }
 }
@@ -204,6 +206,9 @@ fn main() {
                                 let data = u8::from_str(message.data.as_str()).unwrap();
                                 api.spawn(message.message.edit_text(horoscope::get(data)).parse_mode(ParseMode::Markdown));
                             }
+                            Command::About => {
+
+                            }
                             Command::Unknown => {
                             }
                         });
@@ -330,6 +335,18 @@ fn main() {
                     Command::Horoscope => {
                         let markup = horoscope::get_buttons();
                         api.spawn(message.text_reply("Морти, кто ты по гороскопу?").reply_markup(markup).parse_mode(ParseMode::Html));
+                    },
+                    Command::About => {
+                        let data = about::get();
+                        let mut msg: String = "Всего чатов: ".to_string();
+                        msg.push_str(&data.0.to_string());
+                        msg.push_str("\n");
+                        msg.push_str("Уникальных пользователей: ");
+                        msg.push_str(&data.1.to_string());
+                        msg.push_str("\n");
+                        msg.push_str("Участников судной ночи: ");
+                        msg.push_str(&data.2.to_string());
+                        api.spawn(message.text_reply(msg).parse_mode(ParseMode::Html));
                     }
                     Command::Unknown => {
                         db::set_user(chat_id, user);
