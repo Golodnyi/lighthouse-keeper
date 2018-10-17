@@ -74,8 +74,15 @@ fn main() {
     let (mut core, api) = self::init();
     let future = api.send(GetMe);
     let bot = core.run(future);
-    
-    thread::spawn(|| {
+    let mut bot_id: UserId = UserId::new(0);
+
+    match bot {
+        Ok(ref data) => {
+            bot_id = data.id;
+        },
+        Err(ref _e) => {}
+    }    
+    thread::spawn(move || {
         let (mut core_thread, api_thread) = self::init();
 
         loop {
@@ -87,6 +94,23 @@ fn main() {
                 let mut message: String = "Судная ночь начата сска:\n".to_string();
                 let chat_id = ChatId::new(s.chat_id.parse::<i64>().unwrap_or(0));
                 let mut count_users = 0;
+
+                if bot_id != UserId::new(0) {
+                    let chat_member = api_thread.send(GetChatMember::new(chat_id, &bot_id));
+                    match core_thread.run(chat_member) {
+                        Ok(data) => {
+                            if data.status != ChatMemberStatus::Administrator {
+                                continue;
+                            }
+                        },
+                        Err(e) => {
+                            continue;
+                        }
+                    }
+                } else {
+                    continue;
+                }
+
                 for u in s.users {
                     let chat_member = api_thread.send(GetChatMember::new(chat_id, &u.id));
                     match core_thread.run(chat_member) {
@@ -122,6 +146,22 @@ fn main() {
                     let mut message: String = "Начнем судную ночь, я определил участников, у них есть ~24 часа чтоб подать признаки жизни:\n".to_string();
                     let chat_id = ChatId::new(s.chat_id.parse::<i64>().unwrap_or(0));
         
+                    if bot_id != UserId::new(0) {
+                        let chat_member = api_thread.send(GetChatMember::new(chat_id, &bot_id));
+                        match core_thread.run(chat_member) {
+                            Ok(data) => {
+                                if data.status != ChatMemberStatus::Administrator {
+                                    continue;
+                                }
+                            },
+                            Err(e) => {
+                                continue;
+                            }
+                        }
+                    } else {
+                        continue;
+                    }
+
                     if db::can_write_silent(chat_id) == false {
                         continue;
                     }
