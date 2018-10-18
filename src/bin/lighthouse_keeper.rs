@@ -71,6 +71,7 @@ fn init() -> (Core, Api) {
 }
 
 fn main() {
+    println!("start {:?}", structs::get_date());
     let (mut core, api) = self::init();
     let future = api.send(GetMe);
     let bot = core.run(future);

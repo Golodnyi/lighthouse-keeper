@@ -28,3 +28,9 @@ pub fn get_unix_timestamp() -> i64 {
 
     seconds
 }
+
+pub fn get_date() -> String {
+    let dt = Local::now();
+
+    dt.format("%Y-%m-%d %H:%M:%S").to_string()
+}
