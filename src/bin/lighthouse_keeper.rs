@@ -91,8 +91,8 @@ fn main() {
             let silent_for_kick = silent::get_for_kick();
             let silent_for_kick_count = silent_for_kick.len();
 
-            let mut count_users = 0;
             for s in silent {
+                let mut count_users = 0;
                 let mut message: String = "Начнем судную ночь, я определил участников, у них есть ~24 часа чтоб подать признаки жизни:\n".to_string();
                 let chat_id = ChatId::new(s.chat_id.parse::<i64>().unwrap_or(0));
     
