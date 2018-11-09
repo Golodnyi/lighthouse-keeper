@@ -284,7 +284,7 @@ fn main() {
                                 msg: 0
                             };
 
-                            if b.id != user.id {
+                            if b.id != user.id && user.is_bot.unwrap_or(false) == false {
                                 db::set_user(chat_id, u);
                             }
                         }
