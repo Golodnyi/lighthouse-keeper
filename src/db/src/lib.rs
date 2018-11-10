@@ -19,7 +19,7 @@ pub fn set_user(chat_id: ChatId, user: structs::User) -> bool {
 
     let timestamp = structs::get_unix_timestamp();
     connection.execute(
-        "insert or replace into users (chat_id, timestamp, count) values (?1, ?2, (SELECT count+1 FROM stats WHERE chat_id = ?1 LIMIT 1));",
+        "insert or replace into stats (chat_id, timestamp, count) values (?1, ?2, (SELECT count+1 FROM stats WHERE chat_id = ?1 LIMIT 1));",
         &[&chat_id.to_string(), &timestamp]
     ).unwrap();
 
