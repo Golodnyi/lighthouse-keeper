@@ -92,6 +92,10 @@ pub fn get(sign: u8) -> String {
         }
     }
 
+    if horoscope.data.reports.len() == 0 {
+        text.push_str("Сервис временно недоступен :(");
+    }
+
     for h in horoscope.data.reports.iter() {
         if h.sign == sign {
             text.push_str("Здоровье: ");
