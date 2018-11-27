@@ -8,11 +8,6 @@ use std::io::Read;
 
 #[derive(Deserialize, Debug)]
 struct Horoscope {
-    data: HoroscopeItem
-}
-
-#[derive(Deserialize, Debug)]
-struct HoroscopeItem {
     period: String,
     reports: Vec<Report>
 }
@@ -22,7 +17,6 @@ struct Report {
     id: String,
     period: String,
     text: String,
-    sign: u8,
     numbers: Vec<u8>,
     stats: Stat
 }
@@ -41,18 +35,18 @@ struct HoroscopeValues {
 
 fn get_horoscope_vector() -> Vec<HoroscopeValues> {
     let mut horoscope_values: Vec<HoroscopeValues> = vec![];
-    horoscope_values.push(HoroscopeValues {name: "Овен".to_owned(), code: 1});
-    horoscope_values.push(HoroscopeValues {name: "Телец".to_owned(), code: 2});
-    horoscope_values.push(HoroscopeValues {name: "Близнецы".to_owned(), code: 3});
-    horoscope_values.push(HoroscopeValues {name: "Рак".to_owned(), code: 4});
-    horoscope_values.push(HoroscopeValues {name: "Лев".to_owned(), code: 5});
-    horoscope_values.push(HoroscopeValues {name: "Дева".to_owned(), code: 6});
-    horoscope_values.push(HoroscopeValues {name: "Весы".to_owned(), code: 7});
-    horoscope_values.push(HoroscopeValues {name: "Скорпион".to_owned(), code: 8});
-    horoscope_values.push(HoroscopeValues {name: "Стрелец".to_owned(), code: 9});
-    horoscope_values.push(HoroscopeValues {name: "Козерог".to_owned(), code: 10});
-    horoscope_values.push(HoroscopeValues {name: "Водолей".to_owned(), code: 11});
-    horoscope_values.push(HoroscopeValues {name: "Рыбы".to_owned(), code: 12});
+    horoscope_values.push(HoroscopeValues {name: "Овен".to_owned(), code: 0});
+    horoscope_values.push(HoroscopeValues {name: "Телец".to_owned(), code: 1});
+    horoscope_values.push(HoroscopeValues {name: "Близнецы".to_owned(), code: 2});
+    horoscope_values.push(HoroscopeValues {name: "Рак".to_owned(), code: 3});
+    horoscope_values.push(HoroscopeValues {name: "Лев".to_owned(), code: 4});
+    horoscope_values.push(HoroscopeValues {name: "Дева".to_owned(), code: 5});
+    horoscope_values.push(HoroscopeValues {name: "Весы".to_owned(), code: 6});
+    horoscope_values.push(HoroscopeValues {name: "Скорпион".to_owned(), code: 7});
+    horoscope_values.push(HoroscopeValues {name: "Стрелец".to_owned(), code: 8});
+    horoscope_values.push(HoroscopeValues {name: "Козерог".to_owned(), code: 9});
+    horoscope_values.push(HoroscopeValues {name: "Водолей".to_owned(), code: 10});
+    horoscope_values.push(HoroscopeValues {name: "Рыбы".to_owned(), code: 11});
 
     horoscope_values
 }
@@ -82,7 +76,7 @@ pub fn get(sign: u8) -> String {
     let mut text = String::new();
     let mut buf = String::new();
     response.read_to_string(&mut buf).expect("Failed to read response");
-    let horoscope: HoroscopeItem = serde_json::from_str(buf.as_str()).expect("Failed to parse json");
+    let horoscope: Horoscope = serde_json::from_str(buf.as_str()).expect("Failed to parse json");
 
     for h in horoscope_values.iter() {
         if h.code == sign {
@@ -96,8 +90,8 @@ pub fn get(sign: u8) -> String {
         text.push_str("Сервис временно недоступен :(");
     }
 
-    for h in horoscope.reports.iter() {
-        if h.sign == sign {
+    for (i, h) in horoscope.reports.iter().enumerate() {
+        if i as u8 == sign {
             text.push_str("Здоровье: ");
             text.push_str(h.stats.health.to_string().as_str());
             text.push_str("%, ");
