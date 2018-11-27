@@ -92,11 +92,11 @@ pub fn get(sign: u8) -> String {
         }
     }
 
-    if horoscope.data.reports.len() == 0 {
+    if horoscope.reports.len() == 0 {
         text.push_str("Сервис временно недоступен :(");
     }
 
-    for h in horoscope.data.reports.iter() {
+    for h in horoscope.reports.iter() {
         if h.sign == sign {
             text.push_str("Здоровье: ");
             text.push_str(h.stats.health.to_string().as_str());
