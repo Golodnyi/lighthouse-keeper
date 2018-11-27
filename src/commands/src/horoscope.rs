@@ -82,7 +82,7 @@ pub fn get(sign: u8) -> String {
     let mut text = String::new();
     let mut buf = String::new();
     response.read_to_string(&mut buf).expect("Failed to read response");
-    let horoscope: Horoscope = serde_json::from_str(buf.as_str()).expect("Failed to parse json");
+    let horoscope: HoroscopeItem = serde_json::from_str(buf.as_str()).expect("Failed to parse json");
 
     for h in horoscope_values.iter() {
         if h.code == sign {
