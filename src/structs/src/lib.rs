@@ -34,3 +34,10 @@ pub fn get_date() -> String {
 
     dt.format("%Y-%m-%d %H:%M:%S").to_string()
 }
+
+
+pub fn get_period() -> String {
+    let dt = Local::now();
+
+    dt.format("D%Y%m%d").to_string()
+}

@@ -2,6 +2,7 @@ extern crate reqwest;
 extern crate serde;
 extern crate serde_json;
 extern crate telegram_bot;
+extern crate structs;
 
 use self::telegram_bot::*;
 use std::io::Read;
@@ -70,7 +71,11 @@ pub fn get_buttons() -> InlineKeyboardMarkup {
 
 pub fn get(sign: u8) -> String {
     let horoscope_values = get_horoscope_vector();
-    let mut response = reqwest::get("https://horoscope.zborg.ru/api/reports.json?client=telegram.bot")
+
+    let client = reqwest::Client::new();
+    let mut response = client.get("https://horoscope.zborg.ru/api/reports.json?client=telegram.bot")
+        .query(&[("period", &structs::get_period())])
+        .send()
         .expect("Failed to send request");
 
     let mut text = String::new();
