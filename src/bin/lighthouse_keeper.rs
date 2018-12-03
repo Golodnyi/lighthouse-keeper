@@ -86,6 +86,8 @@ fn main() {
         let (mut core_thread, api_thread) = self::init();
 
         loop {
+            db::delete_old_stats();
+
             let silent = silent::get();
             let silent_for_kick = silent::get_for_kick();
 

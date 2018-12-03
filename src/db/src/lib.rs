@@ -350,3 +350,13 @@ pub fn can_write_silent(chat_id: ChatId) -> bool {
 
     can_write
 }
+
+pub fn delete_old_stats() {
+    let connection = self::connect();
+    connection.execute(
+        "DELETE FROM stats WHERE timestamp < (strftime('%s', 'now') - 86400 * 31 * 3);",
+        &[]
+    ).unwrap();
+
+    connection.close().expect("connection not closed");
+}
