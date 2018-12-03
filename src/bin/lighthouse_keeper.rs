@@ -243,7 +243,7 @@ fn main() {
                                 }
                             },
                             Command::Horoscope => {
-                                let data = u8::from_str(message.data.as_str()).unwrap();
+                                let data: String = message.data.to_owned();
                                 api.spawn(message.message.edit_text(horoscope::get(data)).parse_mode(ParseMode::Markdown));
                             }
                             Command::About => {

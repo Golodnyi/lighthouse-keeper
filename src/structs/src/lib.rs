@@ -41,3 +41,10 @@ pub fn get_period() -> String {
 
     dt.format("D%Y%m%d").to_string()
 }
+
+pub fn get_button_name(number: String) -> String {
+    let mut period = self::get_period();
+    period.push_str(number.as_str());
+
+    period
+}
