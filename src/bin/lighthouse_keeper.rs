@@ -11,7 +11,6 @@ use futures::Stream;
 use tokio_core::reactor::Core;
 use telegram_bot::*;
 use commands::*;
-use std::str::FromStr;
 use std::thread;
 use std::time::Duration;
 use telegram_bot_raw::types::*;
@@ -89,7 +88,6 @@ fn main() {
         loop {
             let silent = silent::get();
             let silent_for_kick = silent::get_for_kick();
-            let silent_for_kick_count = silent_for_kick.len();
 
             for s in silent {
                 let mut count_users = 0;
@@ -104,7 +102,7 @@ fn main() {
                                 continue;
                             }
                         },
-                        Err(e) => {
+                        Err(_e) => {
                             continue;
                         }
                     }
@@ -124,7 +122,7 @@ fn main() {
                                 continue;
                             }
                         },
-                        Err(e) => {
+                        Err(_e) => {
                             db::left_user(chat_id, u.id);
                             continue;
                         }
@@ -158,7 +156,7 @@ fn main() {
                                 continue;
                             }
                         },
-                        Err(e) => {
+                        Err(_e) => {
                             continue;
                         }
                     }
@@ -174,7 +172,7 @@ fn main() {
                                 continue;
                             }
                         },
-                        Err(e) => {
+                        Err(_e) => {
                             db::left_user(chat_id, u.id);
                             continue;
                         }
@@ -306,52 +304,52 @@ fn main() {
                 }
             }
 
-            if let MessageKind::Audio {ref data, ..} = message.kind {
+            if let MessageKind::Audio {data: _, ..} = message.kind {
                 let user = self::parse_user(&message);
                 db::set_user(chat_id, user);
             }
 
-            if let MessageKind::Document {ref data, ..} = message.kind {
+            if let MessageKind::Document {data: _, ..} = message.kind {
                 let user = self::parse_user(&message);
                 db::set_user(chat_id, user);
             }
 
-            if let MessageKind::Photo {ref data, ..} = message.kind {
+            if let MessageKind::Photo {data: _, ..} = message.kind {
                 let user = self::parse_user(&message);
                 db::set_user(chat_id, user);
             }
 
-            if let MessageKind::Sticker {ref data, ..} = message.kind {
+            if let MessageKind::Sticker {data: _, ..} = message.kind {
                 let user = self::parse_user(&message);
                 db::set_user(chat_id, user);
             }
 
-            if let MessageKind::Video {ref data, ..} = message.kind {
+            if let MessageKind::Video {data: _, ..} = message.kind {
                 let user = self::parse_user(&message);
                 db::set_user(chat_id, user);
             }
 
-            if let MessageKind::Voice {ref data, ..} = message.kind {
+            if let MessageKind::Voice {data: _, ..} = message.kind {
                 let user = self::parse_user(&message);
                 db::set_user(chat_id, user);
             }
 
-            if let MessageKind::VideoNote {ref data, ..} = message.kind {
+            if let MessageKind::VideoNote {data: _, ..} = message.kind {
                 let user = self::parse_user(&message);
                 db::set_user(chat_id, user);
             }
 
-            if let MessageKind::Contact {ref data, ..} = message.kind {
+            if let MessageKind::Contact {data: _, ..} = message.kind {
                 let user = self::parse_user(&message);
                 db::set_user(chat_id, user);
             }
 
-            if let MessageKind::Location {ref data, ..} = message.kind {
+            if let MessageKind::Location {data: _, ..} = message.kind {
                 let user = self::parse_user(&message);
                 db::set_user(chat_id, user);
             }
 
-            if let MessageKind::Venue {ref data, ..} = message.kind {
+            if let MessageKind::Venue {data: _, ..} = message.kind {
                 let user = self::parse_user(&message);
                 db::set_user(chat_id, user);
             }
