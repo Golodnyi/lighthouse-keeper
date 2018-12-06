@@ -8,6 +8,11 @@ use self::telegram_bot::*;
 use std::io::Read;
 
 #[derive(Deserialize, Debug)]
+struct HoroscopeData {
+    data: Horoscope,
+}
+
+#[derive(Deserialize, Debug)]
 struct Horoscope {
     period: String,
     reports: Vec<Report>
@@ -81,8 +86,9 @@ pub fn get(sign: String) -> String {
     let mut text = String::new();
     let mut buf = String::new();
     response.read_to_string(&mut buf).expect("Failed to read response");
-    let horoscope: Horoscope = serde_json::from_str(buf.as_str()).expect("Failed to parse json");
-
+    let horoscope: HoroscopeData = serde_json::from_str(buf.as_str()).expect("Failed to parse json");
+    let horoscope: Horoscope = horoscope.data;
+    
     for h in horoscope_values.iter() {
         if h.code == sign {
             text.push_str("*");
