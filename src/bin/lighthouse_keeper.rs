@@ -92,6 +92,19 @@ fn main() {
             let silent_for_kick = silent::get_for_kick();
 
             for s in silent {
+                for u in s.users {
+                    let chat_member = api_thread.send(GetChatMember::new(chat_id, &u.id));
+                    match core_thread.run(chat_member) {
+                        Ok(_data) => {
+                            continue;
+                        },
+                        Err(_e) => {
+                            db::left_user(chat_id, u.id);
+                            continue;
+                        }
+                    }
+                }
+
                 let mut count_users = 0;
                 let mut message: String = "Начнем судную ночь, я определил участников, у них есть ~24 часа чтоб подать признаки жизни:\n".to_string();
                 let chat_id = ChatId::new(s.chat_id.parse::<i64>().unwrap_or(0));
