@@ -92,6 +92,10 @@ fn main() {
             let silent_for_kick = silent::get_for_kick();
 
             for s in silent {
+                let mut count_users = 0;
+                let mut message: String = "Начнем судную ночь, я определил участников, у них есть ~24 часа чтоб подать признаки жизни:\n".to_string();
+                let chat_id = ChatId::new(s.chat_id.parse::<i64>().unwrap_or(0));
+    
                 for u in s.users {
                     let chat_member = api_thread.send(GetChatMember::new(chat_id, &u.id));
                     match core_thread.run(chat_member) {
@@ -105,10 +109,6 @@ fn main() {
                     }
                 }
 
-                let mut count_users = 0;
-                let mut message: String = "Начнем судную ночь, я определил участников, у них есть ~24 часа чтоб подать признаки жизни:\n".to_string();
-                let chat_id = ChatId::new(s.chat_id.parse::<i64>().unwrap_or(0));
-    
                 if bot_id != UserId::new(0) {
                     let chat_member = api_thread.send(GetChatMember::new(chat_id, &bot_id));
                     match core_thread.run(chat_member) {
