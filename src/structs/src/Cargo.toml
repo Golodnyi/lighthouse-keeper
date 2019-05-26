@@ -8,3 +8,5 @@ path = "lib.rs"
 [dependencies]
 telegram-bot = { git = "https://github.com/bismuth-party/telegram-bot" }
 chrono = "0.4"
+[replace."openssl:0.9.24"]
+git = "https://github.com/kryptco/rust-openssl"

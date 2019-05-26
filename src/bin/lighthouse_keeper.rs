@@ -141,59 +141,59 @@ fn main() {
                 if chat_id != ChatId::new(0) && count_users > 0 {
                     let send = api_thread.send(chat_id.text(message));
                     core_thread.run(send).unwrap();
-                }
-            }
-
-
-            for s in silent_for_kick {
-                let mut message: String = "Судная ночь начата сска:\n".to_string();
-                let chat_id = ChatId::new(s.chat_id.parse::<i64>().unwrap_or(0));
-                let mut count_users = 0;
-
-                if bot_id != UserId::new(0) {
-                    let chat_member = api_thread.send(GetChatMember::new(chat_id, &bot_id));
-                    match core_thread.run(chat_member) {
-                        Ok(data) => {
-                            if data.status != ChatMemberStatus::Administrator {
-                                continue;
-                            }
-                        },
-                        Err(_e) => {
-                            continue;
-                        }
-                    }
                 } else {
-                    continue;
-                }
+                    for s in silent_for_kick {
+                        let mut message: String = "Судная ночь начата сска:\n".to_string();
+                        let chat_id = ChatId::new(s.chat_id.parse::<i64>().unwrap_or(0));
+                        let mut count_users = 0;
 
-                for u in s.users {
-                    let chat_member = api_thread.send(GetChatMember::new(chat_id, &u.id));
-                    match core_thread.run(chat_member) {
-                        Ok(data) => {
-                            if data.status != ChatMemberStatus::Member {
-                                continue;
+                        if bot_id != UserId::new(0) {
+                            let chat_member = api_thread.send(GetChatMember::new(chat_id, &bot_id));
+                            match core_thread.run(chat_member) {
+                                Ok(data) => {
+                                    if data.status != ChatMemberStatus::Administrator {
+                                        continue;
+                                    }
+                                },
+                                Err(_e) => {
+                                    continue;
+                                }
                             }
-                        },
-                        Err(_e) => {
-                            db::left_user(chat_id, u.id);
+                        } else {
                             continue;
                         }
+
+                        for u in s.users {
+                            let chat_member = api_thread.send(GetChatMember::new(chat_id, &u.id));
+                            match core_thread.run(chat_member) {
+                                Ok(data) => {
+                                    if data.status != ChatMemberStatus::Member {
+                                        continue;
+                                    }
+                                },
+                                Err(_e) => {
+                                    db::left_user(chat_id, u.id);
+                                    continue;
+                                }
+                            }
+
+                            count_users += 1;
+                            message.push_str("@");
+                            message.push_str(u.username.as_ref().unwrap_or(&u.first_name));
+                            message.push_str(" - убит\n");
+                            let kick = api_thread.send(KickChatMember::new(chat_id, &u.id));
+                            core_thread.run(kick).unwrap();
+                            db::left_user(chat_id, u.id);
+                        }
+
+                        if chat_id != ChatId::new(0) && count_users > 0 {
+                            let send = api_thread.send(chat_id.text(message));
+                            core_thread.run(send).unwrap();
+                        }
                     }
-
-                    count_users += 1;
-                    message.push_str("@");
-                    message.push_str(u.username.as_ref().unwrap_or(&u.first_name));
-                    message.push_str(" - убит\n");
-                    let kick = api_thread.send(KickChatMember::new(chat_id, &u.id));
-                    core_thread.run(kick).unwrap();
-                    db::left_user(chat_id, u.id);
-                }
-
-                if chat_id != ChatId::new(0) && count_users > 0 {
-                    let send = api_thread.send(chat_id.text(message));
-                    core_thread.run(send).unwrap();
                 }
             }
+
             thread::sleep(Duration::from_millis(43200000));
         }
     });
