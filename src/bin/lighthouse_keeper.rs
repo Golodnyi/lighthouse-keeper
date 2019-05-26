@@ -89,7 +89,6 @@ fn main() {
             db::delete_old_stats();
 
             let silent = silent::get();
-            let silent_for_kick = silent::get_for_kick();
 
             for s in silent {
                 let mut count_users = 0;
@@ -142,6 +141,8 @@ fn main() {
                     let send = api_thread.send(chat_id.text(message));
                     core_thread.run(send).unwrap();
                 } else {
+                    let silent_for_kick = silent::get_for_kick();
+    
                     for se in silent_for_kick {
                         let mut message: String = "Судная ночь начата сска:\n".to_string();
                         let chat_id = ChatId::new(se.chat_id.parse::<i64>().unwrap_or(0));
