@@ -142,9 +142,9 @@ fn main() {
                     let send = api_thread.send(chat_id.text(message));
                     core_thread.run(send).unwrap();
                 } else {
-                    for s in silent_for_kick {
+                    for se in silent_for_kick {
                         let mut message: String = "Судная ночь начата сска:\n".to_string();
-                        let chat_id = ChatId::new(s.chat_id.parse::<i64>().unwrap_or(0));
+                        let chat_id = ChatId::new(se.chat_id.parse::<i64>().unwrap_or(0));
                         let mut count_users = 0;
 
                         if bot_id != UserId::new(0) {
