@@ -164,7 +164,7 @@ fn main() {
                             continue;
                         }
 
-                        for u in s.users {
+                        for u in se.users {
                             let chat_member = api_thread.send(GetChatMember::new(chat_id, &u.id));
                             match core_thread.run(chat_member) {
                                 Ok(data) => {
