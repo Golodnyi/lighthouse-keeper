@@ -3,4 +3,3 @@
 **/*.rs.bk
 *.json
 target
-database.sqlite3
