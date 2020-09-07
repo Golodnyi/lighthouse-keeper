@@ -40,7 +40,7 @@ fn get_command(message: &str, bot_name: &str) -> Option<Command> {
         "/search" => Some(Search),
         "/messages" => Some(Messages),
         "/horoscope" => Some(Horoscope),
-        "/about" => Some(About),
+        // "/about" => Some(About),
         _ => Some(Unknown),
     }
 }
