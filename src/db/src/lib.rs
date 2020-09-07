@@ -33,7 +33,7 @@ pub fn get_users_count(chat_id: ChatId) -> usize {
     let mut users: Vec<structs::User> = vec![];
 
     {
-        let mut stmt = connection.prepare("SELECT * FROM users WHERE chat_id = ?1").unwrap();
+        let mut stmt = connection.prepare("SELECT id, username, first_name, date, msg FROM users WHERE chat_id = ?1").unwrap();
         let users_iter = stmt.query_map(&[&chat_id.to_string()], |row| {
             structs::User {
                 id: UserId::new(row.get(0)),
@@ -197,7 +197,7 @@ pub fn get_all_users_count() -> usize {
     let mut users: Vec<structs::User> = vec![];
 
     {
-        let mut stmt = connection.prepare("SELECT * FROM users GROUP BY id").unwrap();
+        let mut stmt = connection.prepare("SELECT id, username, first_name, date, msg FROM users GROUP BY id").unwrap();
         let users_iter = stmt.query_map(&[], |row| {
             structs::User {
                 id: UserId::new(row.get(0)),
